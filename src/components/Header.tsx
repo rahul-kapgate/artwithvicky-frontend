@@ -1,9 +1,30 @@
-import { useState } from "react";
-import { Link } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { Link, useLocation } from "react-router-dom";
 import { Menu, X } from "lucide-react";
 
 export default function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
+  const location = useLocation();
+
+  // Scroll to hash target after navigating
+  useEffect(() => {
+    const hash = location.hash;
+    if (hash) {
+      const el = document.querySelector(hash);
+      if (el) {
+        el.scrollIntoView({ behavior: "smooth" });
+      }
+    }
+  }, [location]);
+
+  const isActive = (path: string) => {
+    return location.pathname + location.hash === path;
+  };
+
+  const linkClass = (path: string) =>
+    isActive(path)
+      ? "text-pink-600 underline"
+      : "hover:text-pink-600 transition-colors";
 
   return (
     <header className="bg-white border-b border-pink-100 shadow-sm">
@@ -15,22 +36,16 @@ export default function Header() {
 
         {/* Desktop Nav */}
         <nav className="hidden md:flex space-x-6 text-sm font-medium text-gray-700">
-          <Link to="/" className="hover:text-pink-600 transition-colors">
+          <Link to="/" className={linkClass("/")}>
             Home
           </Link>
-          <Link
-            to="/#gallery"
-            className="hover:text-pink-600 transition-colors"
-          >
+          <Link to="/#gallery" className={linkClass("/#gallery")}>
             Gallery
           </Link>
-          <Link to="/#about" className="hover:text-pink-600 transition-colors">
+          <Link to="/#about" className={linkClass("/#about")}>
             About
           </Link>
-          <Link
-            to="/#contact"
-            className="hover:text-pink-600 transition-colors"
-          >
+          <Link to="/#contact" className={linkClass("/#contact")}>
             Contact
           </Link>
         </nav>
@@ -51,28 +66,28 @@ export default function Header() {
             <Link
               to="/"
               onClick={() => setMenuOpen(false)}
-              className="hover:text-pink-600"
+              className={linkClass("/")}
             >
               Home
             </Link>
             <Link
               to="/#gallery"
               onClick={() => setMenuOpen(false)}
-              className="hover:text-pink-600"
+              className={linkClass("/#gallery")}
             >
               Gallery
             </Link>
             <Link
               to="/#about"
               onClick={() => setMenuOpen(false)}
-              className="hover:text-pink-600"
+              className={linkClass("/#about")}
             >
               About
             </Link>
             <Link
               to="/#contact"
               onClick={() => setMenuOpen(false)}
-              className="hover:text-pink-600"
+              className={linkClass("/#contact")}
             >
               Contact
             </Link>
