@@ -52,11 +52,14 @@ export default function Home() {
       {/* About Section */}
       <section className="py-20 bg-pink-50 px-4">
         <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-3xl font-semibold mb-4">About Vicky</h2>
+          <h2 className="text-3xl font-semibold mb-4">About</h2>
           <p className="text-gray-700 text-lg mb-6">
-            Hi! I'm Vicky, a self-taught artist with a passion for colors,
-            emotions, and visual storytelling. My work is inspired by nature,
-            people, and everyday moments.
+            Art Inspiration & BFA Exam Success – Discover a world of artistic
+            inspiration through captivating videos on drawing, painting, digital
+            art, and more. Simultaneously, navigate your Bachelor of Fine Arts
+            journey with our comprehensive exam guides, study strategies, and
+            important updates. Join us now to fuel your creativity and conquer
+            your BFA exams! 🏆
           </p>
           <Badge
             variant="outline"
