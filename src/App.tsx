@@ -1,16 +1,15 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Home from "./pages/Home";
-// import Login from "./pages/Login";
 import Layout from "./layouts/Layout";
 
 function App() {
   return (
     <Router>
       <Routes>
-        {/* Wrap all routes that share layout */}
+        {/* Layout wraps all pages */}
         <Route path="/" element={<Layout />}>
+          {/* Home page */}
           <Route index element={<Home />} />
-          {/* <Route path="login" element={<Login />} /> */}
         </Route>
       </Routes>
     </Router>

@@ -1,13 +1,13 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Sparkles } from "lucide-react";
+import { Sparkles, Mail, Instagram, Youtube, Facebook } from "lucide-react";
 
 export default function Home() {
   return (
-    <div className="min-h-screen bg-gradient-to-b from-pink-50 via-white to-white text-gray-800">
+    <div className="min-h-screen bg-gradient-to-b from-pink-50 via-white to-white text-gray-800 scroll-smooth">
       {/* Hero Section */}
-      <section className="text-center py-20 px-4">
+      <section id="hero" className="text-center py-20 px-4">
         <div className="max-w-4xl mx-auto">
           <h1 className="text-5xl font-bold mb-4 tracking-tight">
             Welcome to <span className="text-pink-600">Artistic Vicky</span>
@@ -16,12 +16,14 @@ export default function Home() {
             Discover colors, creativity, and inspiration through the eyes of
             Vicky.
           </p>
-          <Button className="text-lg px-6 py-4">Explore Gallery</Button>
+          <a href="#gallery">
+            <Button className="text-lg px-6 py-4">Explore Gallery</Button>
+          </a>
         </div>
       </section>
 
       {/* Featured Artworks */}
-      <section className="py-16 bg-white px-4">
+      <section id="gallery" className="py-16 bg-white px-4">
         <div className="max-w-6xl mx-auto">
           <h2 className="text-3xl font-semibold text-center mb-10">
             Featured Artworks
@@ -50,7 +52,7 @@ export default function Home() {
       </section>
 
       {/* About Section */}
-      <section className="py-20 bg-pink-50 px-4">
+      <section id="about" className="py-20 bg-pink-50 px-4">
         <div className="max-w-4xl mx-auto text-center">
           <h2 className="text-3xl font-semibold mb-4">About</h2>
           <p className="text-gray-700 text-lg mb-6">
@@ -67,6 +69,61 @@ export default function Home() {
           >
             Based in India · Available for commissions
           </Badge>
+        </div>
+      </section>
+
+      {/* Contact Section */}
+      <section id="contact" className="py-20 bg-white px-4">
+        <div className="max-w-4xl mx-auto text-center">
+          <h2 className="text-3xl font-semibold mb-4 text-pink-600">
+            Contact Me
+          </h2>
+          <p className="text-gray-600 mb-10">
+            Feel free to reach out through any of the following platforms:
+          </p>
+          <div className="space-y-6">
+            {/* Email */}
+            <a
+              href="mailto:vikkitembhurne358@gmail.com"
+              className="flex items-center justify-center space-x-2 text-gray-700 hover:text-pink-600 transition-colors duration-200"
+            >
+              <Mail className="w-5 h-5" />
+              <span>vikkitembhurne358@gmail.com</span>
+            </a>
+
+            {/* Instagram */}
+            <a
+              href="https://www.instagram.com/artistic.vicky/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center justify-center space-x-2 text-gray-700 hover:text-pink-600 transition-colors duration-200"
+            >
+              <Instagram className="w-5 h-5" />
+              <span>@artistic.vicky</span>
+            </a>
+
+            {/* YouTube */}
+            <a
+              href="https://www.youtube.com/@ArtisticVicky"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center justify-center space-x-2 text-gray-700 hover:text-pink-600 transition-colors duration-200"
+            >
+              <Youtube className="w-5 h-5" />
+              <span>@ArtisticVicky</span>
+            </a>
+
+            {/* Facebook */}
+            <a
+              href="https://www.facebook.com/mayur.tembhurne.148"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center justify-center space-x-2 text-gray-700 hover:text-pink-600 transition-colors duration-200"
+            >
+              <Facebook className="w-5 h-5" />
+              <span>Vicky Tembhurne</span>
+            </a>
+          </div>
         </div>
       </section>
     </div>

@@ -17,7 +17,7 @@ export default function Footer() {
             </li>
             <li>
               <Link
-                to="/gallery"
+                to="/#gallery"
                 className="text-gray-600 hover:text-pink-600 transition-colors duration-200"
               >
                 Gallery
@@ -25,7 +25,7 @@ export default function Footer() {
             </li>
             <li>
               <Link
-                to="/about"
+                to="/#about"
                 className="text-gray-600 hover:text-pink-600 transition-colors duration-200"
               >
                 About
@@ -33,7 +33,7 @@ export default function Footer() {
             </li>
             <li>
               <Link
-                to="/contact"
+                to="/#contact"
                 className="text-gray-600 hover:text-pink-600 transition-colors duration-200"
               >
                 Contact
