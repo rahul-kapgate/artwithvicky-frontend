@@ -54,7 +54,7 @@ export default function Home() {
       {/* About Section */}
       <section id="about" className="py-20 bg-pink-50 px-4">
         <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-3xl font-semibold mb-4">About</h2>
+          <h2 className="text-3xl font-semibold mb-4">About Us</h2>
           <p className="text-gray-700 text-lg mb-6">
             Art Inspiration & BFA Exam Success – Discover a world of artistic
             inspiration through captivating videos on drawing, painting, digital
@@ -76,7 +76,7 @@ export default function Home() {
       <section id="contact" className="py-20 bg-white px-4">
         <div className="max-w-4xl mx-auto text-center">
           <h2 className="text-3xl font-semibold mb-4 text-pink-600">
-            Contact Me
+            Contact Us
           </h2>
           <p className="text-gray-600 mb-10">
             Feel free to reach out through any of the following platforms:

@@ -28,7 +28,7 @@ export default function Footer() {
                 to="/#about"
                 className="text-gray-600 hover:text-pink-600 transition-colors duration-200"
               >
-                About
+                About Us
               </Link>
             </li>
             <li>
@@ -36,7 +36,7 @@ export default function Footer() {
                 to="/#contact"
                 className="text-gray-600 hover:text-pink-600 transition-colors duration-200"
               >
-                Contact
+                Contact Us
               </Link>
             </li>
           </ul>

@@ -43,10 +43,10 @@ export default function Header() {
             Gallery
           </Link>
           <Link to="/#about" className={linkClass("/#about")}>
-            About
+            About Us
           </Link>
           <Link to="/#contact" className={linkClass("/#contact")}>
-            Contact
+            Contact Us
           </Link>
         </nav>
 
@@ -82,14 +82,14 @@ export default function Header() {
               onClick={() => setMenuOpen(false)}
               className={linkClass("/#about")}
             >
-              About
+              About Us
             </Link>
             <Link
               to="/#contact"
               onClick={() => setMenuOpen(false)}
               className={linkClass("/#contact")}
             >
-              Contact
+              Contact Us
             </Link>
           </nav>
         </div>
