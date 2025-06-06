@@ -12,7 +12,7 @@ function App() {
           {/* Home page */}
           <Route index element={<Home />} />
           {/* ✅ Courses page with correct path */}
-          <Route path="courses" element={<Courses />} />
+          <Route path="/courses" element={<Courses />} />
         </Route>
       </Routes>
     </Router>
