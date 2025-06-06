@@ -48,6 +48,9 @@ export default function Header() {
           <Link to="/#contact" className={linkClass("/#contact")}>
             Contact Us
           </Link>
+          <Link to="/courses" className={linkClass("/courses")}>
+            Courses
+          </Link>
         </nav>
 
         {/* Mobile Menu Toggle */}

@@ -2,6 +2,8 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Sparkles, Mail, Instagram, Youtube, Facebook } from "lucide-react";
+import { Link } from "react-router-dom"; // ⬅️ Make sure this is at the top
+
 
 export default function Home() {
   return (
@@ -69,6 +71,23 @@ export default function Home() {
           >
             Based in India · Available for commissions
           </Badge>
+        </div>
+      </section>
+
+      {/* Courses Section */}
+      <section id="courses" className="py-20 bg-white px-4">
+        <div className="max-w-4xl mx-auto text-center">
+          <h2 className="text-3xl font-semibold mb-4">Our Courses</h2>
+          <p className="text-gray-700 text-lg mb-6">
+            Unlock your creativity and build your skills with our exclusive art
+            courses.
+          </p>
+          <Link
+            to="/courses"
+            className="inline-block bg-pink-600 hover:bg-pink-700 text-white text-lg font-medium px-6 py-3 rounded-full transition duration-300"
+          >
+            View Courses
+          </Link>
         </div>
       </section>
 
