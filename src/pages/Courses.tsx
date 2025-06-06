@@ -9,20 +9,6 @@ const courses = [
     duration: "4 Weeks",
     level: "Beginner",
   },
-  {
-    title: "Watercolor Essentials",
-    description:
-      "Explore color theory and watercolor techniques to create vibrant art.",
-    duration: "6 Weeks",
-    level: "Intermediate",
-  },
-  {
-    title: "Digital Art Mastery",
-    description:
-      "Master Procreate or Photoshop to create digital illustrations.",
-    duration: "8 Weeks",
-    level: "Advanced",
-  },
 ];
 
 export default function Courses() {
@@ -35,11 +21,17 @@ export default function Courses() {
           🎨
         </p>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div
+          className={`grid gap-8 ${
+            courses.length === 1
+              ? "grid-cols-1 place-items-center"
+              : "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3"
+          }`}
+        >
           {courses.map((course, idx) => (
             <Card
               key={idx}
-              className="rounded-2xl shadow-md hover:shadow-lg transition-shadow duration-300"
+              className="rounded-2xl shadow-md hover:shadow-lg transition-shadow duration-300 w-full max-w-md"
             >
               <CardContent className="p-6 text-left space-y-4">
                 <h2 className="text-2xl font-semibold text-pink-700">

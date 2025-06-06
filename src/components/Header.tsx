@@ -94,6 +94,9 @@ export default function Header() {
             >
               Contact Us
             </Link>
+            <Link to="/courses" className={linkClass("/courses")}>
+              Courses
+            </Link>
           </nav>
         </div>
       )}
