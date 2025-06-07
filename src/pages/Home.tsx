@@ -53,6 +53,23 @@ export default function Home() {
         </div>
       </section>
 
+      {/* Courses Section */}
+      <section id="courses" className="py-20 bg-white px-4">
+        <div className="max-w-4xl mx-auto text-center">
+          <h2 className="text-3xl font-semibold mb-4">Our Courses</h2>
+          <p className="text-gray-700 text-lg mb-6">
+            Unlock your creativity and build your skills with our exclusive art
+            courses.
+          </p>
+          <Link
+            to="/courses"
+            className="inline-block bg-pink-600 hover:bg-pink-700 text-white text-lg font-medium px-6 py-3 rounded-full transition duration-300"
+          >
+            View Courses
+          </Link>
+        </div>
+      </section>
+
       {/* About Section */}
       <section id="about" className="py-20 bg-pink-50 px-4">
         <div className="max-w-4xl mx-auto text-center">
@@ -71,23 +88,6 @@ export default function Home() {
           >
             Based in India · Available for commissions
           </Badge>
-        </div>
-      </section>
-
-      {/* Courses Section */}
-      <section id="courses" className="py-20 bg-white px-4">
-        <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-3xl font-semibold mb-4">Our Courses</h2>
-          <p className="text-gray-700 text-lg mb-6">
-            Unlock your creativity and build your skills with our exclusive art
-            courses.
-          </p>
-          <Link
-            to="/courses"
-            className="inline-block bg-pink-600 hover:bg-pink-700 text-white text-lg font-medium px-6 py-3 rounded-full transition duration-300"
-          >
-            View Courses
-          </Link>
         </div>
       </section>
 
