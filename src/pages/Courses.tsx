@@ -78,6 +78,8 @@ export default function Courses() {
                   <span className="block">📈 Level: {course.level}</span>
                 </div> */}
 
+                {/* test */}
+
                 <div className="pt-4">
                   <Button className="w-full text-base font-medium py-2">
                     Enroll Now
