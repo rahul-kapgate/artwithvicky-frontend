@@ -239,6 +239,17 @@ export default function AuthModal({
               {errors.email && (
                 <p className="text-red-500 text-sm">{errors.email}</p>
               )}
+              <input
+                name="password"
+                type="password"
+                placeholder="Password"
+                value={formData.password}
+                onChange={handleChange}
+                className="w-full px-4 py-2 border rounded-lg"
+              />
+              {errors.password && (
+                <p className="text-red-500 text-sm">{errors.password}</p>
+              )}
             </>
           )}
           {mode === "login" && (
@@ -269,7 +280,6 @@ export default function AuthModal({
               )}
             </>
           )}
-          
 
           <Button
             type="submit"
