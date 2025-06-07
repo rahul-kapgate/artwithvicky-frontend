@@ -1,8 +1,145 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Sparkles, Mail, Instagram, Youtube, Facebook } from "lucide-react";
+import {  Mail, Instagram, Youtube, Facebook } from "lucide-react";
 import { Link } from "react-router-dom"; // ⬅️ Make sure this is at the top
+import { Swiper, SwiperSlide } from "swiper/react";
+//@ts-ignore
+import "swiper/css";
+//@ts-ignore
+import "swiper/css/autoplay";
+import { Autoplay } from "swiper/modules";
+
+
+
+const artworks = [
+  {
+    title: "Sunset Bloom",
+    description: "A warm sunset embracing the horizon in radiant hues.",
+    imageUrl: "/images/038b8e7fd25d78482c642ccb405e1047.jpg",
+  },
+  {
+    title: "Mystic Forest",
+    description: "A foggy woodland path whispering secrets of nature.",
+    imageUrl: "/images/1878421155e7a3ff9d869a3d2bb756a1.jpg",
+  },
+  {
+    title: "Urban Calm",
+    description: "A peaceful pause in the heart of a bustling city.",
+    imageUrl: "/images/20240417_164034.jpg",
+  },
+  {
+    title: "Floral Burst",
+    description: "A lively explosion of flowers in full bloom.",
+    imageUrl: "/images/20250409_132807.jpg",
+  },
+  {
+    title: "Dreamy Dusk",
+    description: "A tranquil evening sky fading into the night.",
+    imageUrl: "/images/20250603_144839.jpg",
+  },
+  {
+    title: "Ethereal Lake",
+    description: "Still waters reflect the soul of the skies.",
+    imageUrl: "/images/26080428a75c521c530cf451fbea58f6.jpg",
+  },
+  {
+    title: "Cosmic Whisper",
+    description: "A dreamy abstraction of stars in silent motion.",
+    imageUrl: "/images/2c05e915422d5626f0e272caaaaf3aee.jpg",
+  },
+  {
+    title: "Morning Bliss",
+    description: "The soft glow of dawn brushing the earth awake.",
+    imageUrl: "/images/61837c25e589da6e929c249c111b81ec.jpg",
+  },
+  {
+    title: "Color Symphony",
+    description: "A vibrant chorus of hues dancing together.",
+    imageUrl: "/images/7281da70f2432214f51175d35a3db60f.jpg",
+  },
+  {
+    title: "Silent Hills",
+    description: "Gentle gradients roll over hushed hilltops.",
+    imageUrl: "/images/IMG-20250506-WA0030.jpg",
+  },
+  {
+    title: "Golden Horizon",
+    description: "The sun melts into gold as day bids goodbye.",
+    imageUrl: "/images/IMG-20250506-WA0033.jpg",
+  },
+  {
+    title: "Velvet Night",
+    description: "A deep night sky wrapped in a velvet aura.",
+    imageUrl: "/images/IMG_20241223_090922_733.jpg",
+  },
+  {
+    title: "Crimson Valley",
+    description: "A red-drenched dreamland nestled in silence.",
+    imageUrl: "/images/IMG_20241223_090925_096.jpg",
+  },
+  {
+    title: "Ocean Whirl",
+    description: "Waves of color crashing in abstract beauty.",
+    imageUrl: "/images/IMG_20241223_090927_647.jpg",
+  },
+  {
+    title: "Twilight Dance",
+    description: "Where light and shadow swirl in harmony.",
+    imageUrl: "/images/IMG_20241223_090929_603.jpg",
+  },
+  {
+    title: "Autumn Rhapsody",
+    description: "A song of falling leaves and fading light.",
+    imageUrl: "/images/IMG_20241223_090931_702.jpg",
+  },
+  {
+    title: "Frozen Echo",
+    description: "Cold tones reverberate in icy stillness.",
+    imageUrl: "/images/IMG_20241223_090934_709.jpg",
+  },
+  {
+    title: "Firefly Garden",
+    description: "Tiny sparks of light dancing through twilight.",
+    imageUrl: "/images/IMG_20250403_080603_783.jpg",
+  },
+  {
+    title: "Celestial Dreams",
+    description: "A surreal glimpse into an imagined galaxy.",
+    imageUrl: "/images/IMG_20250403_080642_504.jpg",
+  },
+  {
+    title: "Serenity Shore",
+    description: "Gentle tides caress the sands of calm.",
+    imageUrl: "/images/IMG_20250403_083158_726.jpg",
+  },
+  {
+    title: "Radiant Bloom",
+    description: "Petals burst with life and joyful color.",
+    imageUrl: "/images/b4893c380785578e08c308239538ff7f.jpg",
+  },
+  {
+    title: "Sapphire Skies",
+    description: "A sky painted in deep and dazzling blue.",
+    imageUrl: "/images/bfb83b4a9dfc73c8e6f935888a18cda6.jpg",
+  },
+  {
+    title: "Pastel Pathways",
+    description: "A gentle journey through soft-toned landscapes.",
+    imageUrl: "/images/e5e055325b4b74e1d79756143c15b3c1.jpg",
+  },
+  {
+    title: "Shimmering Silence",
+    description: "A quiet place where light softly lingers.",
+    imageUrl: "/images/f81570e57f8e33072ab04ddd8aebc6c2.jpg",
+  },
+  {
+    title: "Whispering Winds",
+    description: "Motion and stillness balanced in flowing tones.",
+    imageUrl: "/images/fbf2464895b0a9ec3059b8ca99b7e719.jpg",
+  },
+];
+
 
 
 export default function Home() {
@@ -30,26 +167,41 @@ export default function Home() {
           <h2 className="text-3xl font-semibold text-center mb-10">
             Featured Artworks
           </h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
-            {["Sunset Bloom", "Mystic Forest", "Urban Calm"].map(
-              (title, idx) => (
-                <Card
-                  key={idx}
-                  className="rounded-2xl shadow-md hover:scale-105 transition-transform duration-300"
-                >
+          <Swiper
+            modules={[Autoplay]}
+            autoplay={{
+              delay: 2000,
+              disableOnInteraction: false,
+              pauseOnMouseEnter: true,
+            }}
+            spaceBetween={20}
+            breakpoints={{
+              0: { slidesPerView: 1 }, // Mobile
+              640: { slidesPerView: 2 }, // Small tablets
+              1024: { slidesPerView: 3 }, // Laptops and larger
+            }}
+            loop={true}
+          >
+            {artworks.map((art, idx) => (
+              <SwiperSlide key={idx}>
+                <Card className="rounded-2xl shadow-md hover:scale-105 transition-transform duration-300 h-full">
                   <CardContent className="p-4">
-                    <div className="h-48 bg-gray-200 mb-4 rounded-xl flex items-center justify-center">
-                      <Sparkles className="h-10 w-10 text-pink-500" />
+                    <div className="h-48 bg-gray-100 mb-4 rounded-xl overflow-hidden">
+                      <img
+                        src={art.imageUrl}
+                        alt={art.title}
+                        className="w-full h-full object-cover"
+                      />
                     </div>
-                    <h3 className="text-xl font-medium">{title}</h3>
+                    <h3 className="text-xl font-medium">{art.title}</h3>
                     <p className="text-sm text-gray-500 mt-1">
-                      Original painting by Vicky
+                      {art.description}
                     </p>
                   </CardContent>
                 </Card>
-              )
-            )}
-          </div>
+              </SwiperSlide>
+            ))}
+          </Swiper>
         </div>
       </section>
 
