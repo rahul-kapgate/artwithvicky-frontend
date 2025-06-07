@@ -1,15 +1,15 @@
 import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { Menu, X } from "lucide-react"; // Removed User icon as it's no longer needed
+import { Menu, X } from "lucide-react";
 import AuthModal from "../pages/AuthModal";
 
 export default function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
   const [modalMode, setModalMode] = useState<"login" | "signup">("login");
-  const [user, setUser] = useState<{ name: string } | null>(null);
   const location = useLocation();
 
+  // Scroll to hash target after navigating
   useEffect(() => {
     const hash = location.hash;
     if (hash) {
@@ -20,23 +20,9 @@ export default function Header() {
     }
   }, [location]);
 
-  useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (token) {
-      fetch("https://artwithvicky-backend.onrender.com/api/users/me", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      })
-        .then((res) => res.json())
-        .then((data) => {
-          if (data.name) setUser({ name: data.name });
-        })
-        .catch(() => setUser(null));
-    }
-  }, [modalOpen]);
-
-  const isActive = (path: string) => location.pathname + location.hash === path;
+  const isActive = (path: string) => {
+    return location.pathname + location.hash === path;
+  };
 
   const linkClass = (path: string) =>
     isActive(path)
@@ -49,25 +35,19 @@ export default function Header() {
   const openModal = (mode: "login" | "signup") => {
     setModalMode(mode);
     setModalOpen(true);
-    setMenuOpen(false);
+    setMenuOpen(false); // Close mobile menu if open
   };
-
-  const logout = () => {
-    localStorage.removeItem("token");
-    setUser(null);
-  };
-
-  // Get the first letter of the user's name for the profile picture
-  const getInitial = (name: string) => name.charAt(0).toUpperCase();
 
   return (
     <>
       <header className="bg-white border-b border-pink-100 shadow-sm">
         <div className="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
+          {/* Logo */}
           <Link to="/" className="text-2xl font-bold text-pink-600">
             Artistic Vicky
           </Link>
 
+          {/* Desktop Nav */}
           <nav className="hidden md:flex space-x-6 text-sm font-medium text-gray-700 items-center">
             <Link to="/" className={linkClass("/")}>
               Home
@@ -84,34 +64,15 @@ export default function Header() {
             <Link to="/courses" className={linkClass("/courses")}>
               Courses
             </Link>
-            {user ? (
-              <div className="flex items-center space-x-4">
-                <div className="w-8 h-8 rounded-full bg-pink-600 text-white flex items-center justify-center text-lg font-semibold">
-                  {getInitial(user.name)}
-                </div>
-                <span>{user.name}</span>
-                <button onClick={logout} className={buttonClass}>
-                  Logout
-                </button>
-              </div>
-            ) : (
-              <>
-                <button
-                  onClick={() => openModal("login")}
-                  className={buttonClass}
-                >
-                  Login
-                </button>
-                <button
-                  onClick={() => openModal("signup")}
-                  className={`${buttonClass} hidden`}
-                >
-                  Signup
-                </button>
-              </>
-            )}
+            <button onClick={() => openModal("login")} className={buttonClass}>
+              Login
+            </button>
+            <button onClick={() => openModal("signup")} className={`${buttonClass} hidden`}>
+              Signup
+            </button>
           </nav>
 
+          {/* Mobile Menu Toggle */}
           <button
             onClick={() => setMenuOpen(!menuOpen)}
             className="md:hidden text-pink-600"
@@ -124,6 +85,7 @@ export default function Header() {
           </button>
         </div>
 
+        {/* Mobile Dropdown */}
         {menuOpen && (
           <div className="md:hidden px-4 pb-4">
             <nav className="flex flex-col space-y-3 text-sm font-medium text-gray-700">
@@ -162,34 +124,18 @@ export default function Header() {
               >
                 Courses
               </Link>
-              {user ? (
-                <>
-                  <div className="flex items-center space-x-2">
-                    <div className="w-8 h-8 rounded-full bg-pink-600 text-white flex items-center justify-center text-lg font-semibold">
-                      {getInitial(user.name)}
-                    </div>
-                    <span>{user.name}</span>
-                  </div>
-                  <button onClick={logout} className={buttonClass}>
-                    Logout
-                  </button>
-                </>
-              ) : (
-                <>
-                  <button
-                    onClick={() => openModal("login")}
-                    className={`text-left ${buttonClass}`}
-                  >
-                    Login
-                  </button>
-                  <button
-                    onClick={() => openModal("signup")}
-                    className={`text-left ${buttonClass}`}
-                  >
-                    Signup
-                  </button>
-                </>
-              )}
+              <button
+                onClick={() => openModal("login")}
+                className={`text-left ${buttonClass}`}
+              >
+                Login
+              </button>
+              <button
+                onClick={() => openModal("signup")}
+                className={`text-left ${buttonClass}`}
+              >
+                Signup
+              </button>
             </nav>
           </div>
         )}
