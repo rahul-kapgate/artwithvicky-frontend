@@ -11,7 +11,7 @@ const courses = [
     modules: [
       "Object Drawing",
       "2D Designs",
-      "Mirror Drawing",
+      "Memory Drawing",
       "General Knowledge (GK)",
     ],
     features: [

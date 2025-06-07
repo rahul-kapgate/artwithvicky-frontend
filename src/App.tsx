@@ -11,7 +11,7 @@ function App() {
         <Route path="/" element={<Layout />}>
           {/* Home page */}
           <Route index element={<Home />} />
-          {/* ✅ Courses page with correct path */}
+          {/* Courses page */}
           <Route path="/courses" element={<Courses />} />
         </Route>
       </Routes>
