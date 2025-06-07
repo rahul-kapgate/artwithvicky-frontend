@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { X } from "lucide-react";
+import { toast } from "react-toastify";
 
 interface AuthModalProps {
   mode: "login" | "signup";
@@ -79,6 +80,28 @@ export default function AuthModal({
     return valid;
   };
 
+  const loginHandler = async (emailOrMobile: string, password: string) => {
+    const res = await fetch(
+      "https://artwithvicky-backend.onrender.com/api/users/login",
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: emailOrMobile,
+          password,
+        }),
+      }
+    );
+    const data = await res.json();
+    if (res.ok) {
+      localStorage.setItem("token", data.token);
+      toast.success("Login successful!", { position: "top-right" });
+      onClose();
+    } else {
+      toast.error(data.message || "Login failed", { position: "top-right" });
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!validate()) return;
@@ -114,8 +137,30 @@ export default function AuthModal({
             }
           );
           if (res.ok) {
-            // auto login after signup
-            await loginHandler(formData.email, formData.password);
+            toast.success("Signup successful! Please log in.", {
+              position: "top-right",
+            });
+            // Switch to login mode and reset form
+            onSwitchMode("login");
+            setStep("form");
+            setFormData({
+              fullName: "",
+              mobile: "",
+              email: "",
+              emailOrMobile: "",
+              password: "",
+              otp: "",
+            });
+            setErrors({
+              fullName: "",
+              mobile: "",
+              email: "",
+              emailOrMobile: "",
+              password: "",
+              otp: "",
+            });
+          } else {
+            toast.error("OTP verification failed", { position: "top-right" });
           }
         }
       } else {
@@ -123,29 +168,11 @@ export default function AuthModal({
       }
     } catch (err) {
       console.error("Error submitting form:", err);
+      toast.error("Network error, please try again later.", {
+        position: "top-right",
+      });
     } finally {
       setLoading(false);
-    }
-  };
-
-  const loginHandler = async (emailOrMobile: string, password: string) => {
-    const res = await fetch(
-      "https://artwithvicky-backend.onrender.com/api/users/login",
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          email: emailOrMobile,
-          password,
-        }),
-      }
-    );
-    const data = await res.json();
-    if (res.ok) {
-      localStorage.setItem("token", data.token);
-      onClose();
-    } else {
-      alert(data.message || "Login failed");
     }
   };
 

@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { Menu, X, User } from "lucide-react";
+import { Menu, X } from "lucide-react"; // Removed User icon as it's no longer needed
 import AuthModal from "../pages/AuthModal";
 
 export default function Header() {
@@ -57,6 +57,9 @@ export default function Header() {
     setUser(null);
   };
 
+  // Get the first letter of the user's name for the profile picture
+  const getInitial = (name: string) => name.charAt(0).toUpperCase();
+
   return (
     <>
       <header className="bg-white border-b border-pink-100 shadow-sm">
@@ -66,58 +69,123 @@ export default function Header() {
           </Link>
 
           <nav className="hidden md:flex space-x-6 text-sm font-medium text-gray-700 items-center">
-            <Link to="/" className={linkClass("/")}>Home</Link>
-            <Link to="/#gallery" className={linkClass("/#gallery")}>Gallery</Link>
-            <Link to="/#about" className={linkClass("/#about")}>About Us</Link>
-            <Link to="/#contact" className={linkClass("/#contact")}>Contact Us</Link>
-            <Link to="/courses" className={linkClass("/courses")}>Courses</Link>
+            <Link to="/" className={linkClass("/")}>
+              Home
+            </Link>
+            <Link to="/#gallery" className={linkClass("/#gallery")}>
+              Gallery
+            </Link>
+            <Link to="/#about" className={linkClass("/#about")}>
+              About Us
+            </Link>
+            <Link to="/#contact" className={linkClass("/#contact")}>
+              Contact Us
+            </Link>
+            <Link to="/courses" className={linkClass("/courses")}>
+              Courses
+            </Link>
             {user ? (
-              <div className="flex items-center space-x-2">
-                <User className="w-5 h-5 text-pink-600" />
+              <div className="flex items-center space-x-4">
+                <div className="w-8 h-8 rounded-full bg-pink-600 text-white flex items-center justify-center text-lg font-semibold">
+                  {getInitial(user.name)}
+                </div>
                 <span>{user.name}</span>
-                <button onClick={logout} className={buttonClass}>Logout</button>
+                <button onClick={logout} className={buttonClass}>
+                  Logout
+                </button>
               </div>
             ) : (
               <>
-                <button onClick={() => openModal("login")} className={buttonClass}>Login</button>
-                <button onClick={() => openModal("signup")} className={`${buttonClass} hidden`}>
+                <button
+                  onClick={() => openModal("login")}
+                  className={buttonClass}
+                >
+                  Login
+                </button>
+                <button
+                  onClick={() => openModal("signup")}
+                  className={`${buttonClass} hidden`}
+                >
                   Signup
                 </button>
               </>
             )}
           </nav>
 
-          <button onClick={() => setMenuOpen(!menuOpen)} className="md:hidden text-pink-600">
-            {menuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+          <button
+            onClick={() => setMenuOpen(!menuOpen)}
+            className="md:hidden text-pink-600"
+          >
+            {menuOpen ? (
+              <X className="w-6 h-6" />
+            ) : (
+              <Menu className="w-6 h-6" />
+            )}
           </button>
         </div>
 
         {menuOpen && (
           <div className="md:hidden px-4 pb-4">
             <nav className="flex flex-col space-y-3 text-sm font-medium text-gray-700">
-              <Link to="/" onClick={() => setMenuOpen(false)} className={linkClass("/")}>Home</Link>
-              <Link to="/#gallery" onClick={() => setMenuOpen(false)} className={linkClass("/#gallery")}>
+              <Link
+                to="/"
+                onClick={() => setMenuOpen(false)}
+                className={linkClass("/")}
+              >
+                Home
+              </Link>
+              <Link
+                to="/#gallery"
+                onClick={() => setMenuOpen(false)}
+                className={linkClass("/#gallery")}
+              >
                 Gallery
               </Link>
-              <Link to="/#about" onClick={() => setMenuOpen(false)} className={linkClass("/#about")}>About Us</Link>
-              <Link to="/#contact" onClick={() => setMenuOpen(false)} className={linkClass("/#contact")}>
+              <Link
+                to="/#about"
+                onClick={() => setMenuOpen(false)}
+                className={linkClass("/#about")}
+              >
+                About Us
+              </Link>
+              <Link
+                to="/#contact"
+                onClick={() => setMenuOpen(false)}
+                className={linkClass("/#contact")}
+              >
                 Contact Us
               </Link>
-              <Link to="/courses" onClick={() => setMenuOpen(false)} className={linkClass("/courses")}>Courses</Link>
+              <Link
+                to="/courses"
+                onClick={() => setMenuOpen(false)}
+                className={linkClass("/courses")}
+              >
+                Courses
+              </Link>
               {user ? (
                 <>
                   <div className="flex items-center space-x-2">
-                    <User className="w-5 h-5 text-pink-600" />
+                    <div className="w-8 h-8 rounded-full bg-pink-600 text-white flex items-center justify-center text-lg font-semibold">
+                      {getInitial(user.name)}
+                    </div>
                     <span>{user.name}</span>
                   </div>
-                  <button onClick={logout} className={buttonClass}>Logout</button>
+                  <button onClick={logout} className={buttonClass}>
+                    Logout
+                  </button>
                 </>
               ) : (
                 <>
-                  <button onClick={() => openModal("login")} className={`text-left ${buttonClass}`}>
+                  <button
+                    onClick={() => openModal("login")}
+                    className={`text-left ${buttonClass}`}
+                  >
                     Login
                   </button>
-                  <button onClick={() => openModal("signup")} className={`text-left ${buttonClass}`}>
+                  <button
+                    onClick={() => openModal("signup")}
+                    className={`text-left ${buttonClass}`}
+                  >
                     Signup
                   </button>
                 </>
