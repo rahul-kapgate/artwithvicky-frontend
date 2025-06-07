@@ -3,16 +3,24 @@ import { Button } from "@/components/ui/button";
 import { X } from "lucide-react";
 import { toast } from "react-toastify";
 
+interface User {
+  userId: string;
+  fullName: string;
+  email: string;
+}
+
 interface AuthModalProps {
   mode: "login" | "signup";
   onClose: () => void;
   onSwitchMode: (newMode: "login" | "signup") => void;
+  onLoginSuccess: (user: User) => void;
 }
 
 export default function AuthModal({
   mode,
   onClose,
   onSwitchMode,
+  onLoginSuccess,
 }: AuthModalProps) {
   const [formData, setFormData] = useState({
     fullName: "",
@@ -95,6 +103,11 @@ export default function AuthModal({
     const data = await res.json();
     if (res.ok) {
       localStorage.setItem("token", data.token);
+      onLoginSuccess({
+        userId: data.userId,
+        fullName: data.fullName,
+        email: data.email,
+      });
       toast.success("Login successful!", { position: "top-right" });
       onClose();
     } else {

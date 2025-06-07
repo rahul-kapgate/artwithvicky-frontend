@@ -3,11 +3,33 @@ import { Link, useLocation } from "react-router-dom";
 import { Menu, X } from "lucide-react";
 import AuthModal from "../pages/AuthModal";
 
+interface User {
+  userId: string;
+  fullName: string;
+  email: string;
+}
+
 export default function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
   const [modalMode, setModalMode] = useState<"login" | "signup">("login");
+  const [user, setUser] = useState<User | null>(null);
   const location = useLocation();
+
+  // Check for token and fetch user data on mount
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      // Assuming the loginHandler in AuthModal sets the token
+      // You might want to verify the token or fetch user data
+      // For now, we'll use a simplified approach
+      // In a real app, you might want to make an API call to verify the token
+      const storedUser = localStorage.getItem("user");
+      if (storedUser) {
+        setUser(JSON.parse(storedUser));
+      }
+    }
+  }, []);
 
   // Scroll to hash target after navigating
   useEffect(() => {
@@ -35,7 +57,20 @@ export default function Header() {
   const openModal = (mode: "login" | "signup") => {
     setModalMode(mode);
     setModalOpen(true);
-    setMenuOpen(false); // Close mobile menu if open
+    setMenuOpen(false);
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    setUser(null);
+  };
+
+  // Update AuthModal to store user data after login
+  const handleLoginSuccess = (userData: User) => {
+    setUser(userData);
+    localStorage.setItem("user", JSON.stringify(userData));
+    setModalOpen(false);
   };
 
   return (
@@ -64,12 +99,31 @@ export default function Header() {
             <Link to="/courses" className={linkClass("/courses")}>
               Courses
             </Link>
-            <button onClick={() => openModal("login")} className={buttonClass}>
-              Login
-            </button>
-            <button onClick={() => openModal("signup")} className={`${buttonClass} hidden`}>
-              Signup
-            </button>
+            {user ? (
+              <>
+                <div className="w-8 h-8 rounded-full bg-pink-600 text-white flex items-center justify-center font-bold text-lg">
+                  {user.fullName.charAt(0).toUpperCase()}
+                </div>
+                <button onClick={handleLogout} className={buttonClass}>
+                  Logout
+                </button>
+              </>
+            ) : (
+              <>
+                <button
+                  onClick={() => openModal("login")}
+                  className={buttonClass}
+                >
+                  Login
+                </button>
+                <button
+                  onClick={() => openModal("signup")}
+                  className={`${buttonClass} hidden`}
+                >
+                  Signup
+                </button>
+              </>
+            )}
           </nav>
 
           {/* Mobile Menu Toggle */}
@@ -124,18 +178,37 @@ export default function Header() {
               >
                 Courses
               </Link>
-              <button
-                onClick={() => openModal("login")}
-                className={`text-left ${buttonClass}`}
-              >
-                Login
-              </button>
-              <button
-                onClick={() => openModal("signup")}
-                className={`text-left ${buttonClass}`}
-              >
-                Signup
-              </button>
+              {user ? (
+                <>
+                  <div className="w-8 h-8 rounded-full bg-pink-600 text-white flex items-center justify-center font-bold text-lg">
+                    {user.fullName.charAt(0).toUpperCase()}
+                  </div>
+                  {/* <button
+                    onClick={() => {
+                      handleLogout();
+                      setMenuOpen(false);
+                    }}
+                    className={`text-left ${buttonClass}`}
+                  >
+                    Logout
+                  </button> */}
+                </>
+              ) : (
+                <>
+                  <button
+                    onClick={() => openModal("login")}
+                    className={`text-left ${buttonClass}`}
+                  >
+                    Login
+                  </button>
+                  <button
+                    onClick={() => openModal("signup")}
+                    className={`text-left ${buttonClass}`}
+                  >
+                    Signup
+                  </button>
+                </>
+              )}
             </nav>
           </div>
         )}
@@ -145,6 +218,7 @@ export default function Header() {
           mode={modalMode}
           onClose={() => setModalOpen(false)}
           onSwitchMode={(newMode) => setModalMode(newMode)}
+          onLoginSuccess={handleLoginSuccess}
         />
       )}
     </>
