@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { X } from "lucide-react";
-import { toast } from "react-toastify";
 
 interface User {
   userId: string;
@@ -67,16 +66,19 @@ export default function AuthModal({
         newErrors.email = "Valid Email is required";
         valid = false;
       }
+      if (!formData.password || formData.password.length < 6) {
+        newErrors.password = "Password must be at least 6 characters";
+        valid = false;
+      }
     } else if (mode === "login") {
       if (!formData.emailOrMobile) {
         newErrors.emailOrMobile = "Email or Mobile is required";
         valid = false;
       }
-    }
-
-    if (!formData.password || formData.password.length < 6) {
-      newErrors.password = "Password must be at least 6 characters";
-      valid = false;
+      if (!formData.password || formData.password.length < 6) {
+        newErrors.password = "Password must be at least 6 characters";
+        valid = false;
+      }
     }
 
     if (step === "otp" && (!formData.otp || formData.otp.length !== 6)) {
@@ -89,41 +91,47 @@ export default function AuthModal({
   };
 
   const loginHandler = async (emailOrMobile: string, password: string) => {
-    const res = await fetch(
-      "https://artwithvicky-backend.onrender.com/api/users/login",
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          email: emailOrMobile,
-          password,
-        }),
+    try {
+      const res = await fetch(
+        "https://artwithvicky-backend.onrender.com/api/users/login",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            email: emailOrMobile,
+            password,
+          }),
+        }
+      );
+      const data = await res.json();
+      if (res.ok) {
+        // Store token in memory instead of localStorage for demo
+        onLoginSuccess({
+          userId: data.userId,
+          fullName: data.fullName,
+          email: data.email,
+        });
+        // Simulate success toast
+        console.log("Login successful!");
+        onClose();
+      } else {
+        console.error(data.message || "Login failed");
+        setErrors(prev => ({ ...prev, emailOrMobile: data.message || "Login failed" }));
       }
-    );
-    const data = await res.json();
-    if (res.ok) {
-      localStorage.setItem("token", data.token);
-      onLoginSuccess({
-        userId: data.userId,
-        fullName: data.fullName,
-        email: data.email,
-      });
-      toast.success("Login successful!", { position: "top-right" });
-      onClose();
-    } else {
-      toast.error(data.message || "Login failed", { position: "top-right" });
+    } catch (error) {
+      console.error("Network error:", error);
+      setErrors(prev => ({ ...prev, emailOrMobile: "Network error, please try again" }));
     }
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = async () => {
     if (!validate()) return;
     setLoading(true);
 
     try {
       if (mode === "signup") {
         if (step === "form") {
-          await fetch(
+          const res = await fetch(
             "https://artwithvicky-backend.onrender.com/api/users/signup/initiate",
             {
               method: "POST",
@@ -136,7 +144,12 @@ export default function AuthModal({
               }),
             }
           );
-          setStep("otp");
+          if (res.ok) {
+            setStep("otp");
+          } else {
+            const data = await res.json();
+            console.error("Signup initiation failed:", data.message);
+          }
         } else {
           const res = await fetch(
             "https://artwithvicky-backend.onrender.com/api/users/signup/verify",
@@ -150,9 +163,7 @@ export default function AuthModal({
             }
           );
           if (res.ok) {
-            toast.success("Signup successful! Please log in.", {
-              position: "top-right",
-            });
+            console.log("Signup successful! Please log in.");
             // Switch to login mode and reset form
             onSwitchMode("login");
             setStep("form");
@@ -173,7 +184,9 @@ export default function AuthModal({
               otp: "",
             });
           } else {
-            toast.error("OTP verification failed", { position: "top-right" });
+            const data = await res.json();
+            console.error("OTP verification failed:", data.message);
+            setErrors(prev => ({ ...prev, otp: "OTP verification failed" }));
           }
         }
       } else {
@@ -181,20 +194,18 @@ export default function AuthModal({
       }
     } catch (err) {
       console.error("Error submitting form:", err);
-      toast.error("Network error, please try again later.", {
-        position: "top-right",
-      });
+      setErrors(prev => ({ ...prev, emailOrMobile: "Network error, please try again later." }));
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="fixed inset-0 backdrop-blur-sm flex items-center justify-center z-50">
+    <div className="fixed inset-0 bg-opacity-50 backdrop-blur-sm flex items-center justify-center z-50">
       <div className="bg-white rounded-2xl shadow-xl max-w-md w-full mx-4 p-6 relative">
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 text-gray-600 hover:text-pink-600"
+          className="absolute top-4 right-4 text-gray-600 hover:text-pink-600 transition-colors"
         >
           <X className="w-6 h-6" />
         </button>
@@ -205,85 +216,111 @@ export default function AuthModal({
             ? "Sign Up for Artistic Vicky"
             : "Verify OTP"}
         </h2>
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <div className="space-y-4">
           {mode === "signup" && step === "form" && (
             <>
-              <input
-                name="fullName"
-                placeholder="Full Name"
-                value={formData.fullName}
-                onChange={handleChange}
-                className="w-full px-4 py-2 border rounded-lg"
-              />
-              {errors.fullName && (
-                <p className="text-red-500 text-sm">{errors.fullName}</p>
-              )}
-              <input
-                name="mobile"
-                placeholder="Mobile"
-                value={formData.mobile}
-                onChange={handleChange}
-                className="w-full px-4 py-2 border rounded-lg"
-              />
-              {errors.mobile && (
-                <p className="text-red-500 text-sm">{errors.mobile}</p>
-              )}
-              <input
-                name="email"
-                type="email"
-                placeholder="Email"
-                value={formData.email}
-                onChange={handleChange}
-                className="w-full px-4 py-2 border rounded-lg"
-              />
-              {errors.email && (
-                <p className="text-red-500 text-sm">{errors.email}</p>
-              )}
-              <input
-                name="password"
-                type="password"
-                placeholder="Password"
-                value={formData.password}
-                onChange={handleChange}
-                className="w-full px-4 py-2 border rounded-lg"
-              />
-              {errors.password && (
-                <p className="text-red-500 text-sm">{errors.password}</p>
-              )}
+              <div>
+                <input
+                  name="fullName"
+                  placeholder="Full Name"
+                  value={formData.fullName}
+                  onChange={handleChange}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent"
+                />
+                {errors.fullName && (
+                  <p className="text-red-500 text-sm mt-1">{errors.fullName}</p>
+                )}
+              </div>
+              <div>
+                <input
+                  name="mobile"
+                  placeholder="Mobile Number"
+                  value={formData.mobile}
+                  onChange={handleChange}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent"
+                />
+                {errors.mobile && (
+                  <p className="text-red-500 text-sm mt-1">{errors.mobile}</p>
+                )}
+              </div>
+              <div>
+                <input
+                  name="email"
+                  type="email"
+                  placeholder="Email"
+                  value={formData.email}
+                  onChange={handleChange}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent"
+                />
+                {errors.email && (
+                  <p className="text-red-500 text-sm mt-1">{errors.email}</p>
+                )}
+              </div>
+              <div>
+                <input
+                  name="password"
+                  type="password"
+                  placeholder="Password (min 6 characters)"
+                  value={formData.password}
+                  onChange={handleChange}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent"
+                />
+                {errors.password && (
+                  <p className="text-red-500 text-sm mt-1">{errors.password}</p>
+                )}
+              </div>
             </>
           )}
-          {mode === "login" && (
+          
+          {mode === "login" && step === "form" && (
             <>
-              <input
-                name="emailOrMobile"
-                placeholder="Email or Mobile"
-                value={formData.emailOrMobile}
-                onChange={handleChange}
-                className="w-full px-4 py-2 border rounded-lg"
-              />
-              {errors.emailOrMobile && (
-                <p className="text-red-500 text-sm">{errors.emailOrMobile}</p>
-              )}
+              <div>
+                <input
+                  name="emailOrMobile"
+                  placeholder="Email or Mobile Number"
+                  value={formData.emailOrMobile}
+                  onChange={handleChange}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent"
+                />
+                {errors.emailOrMobile && (
+                  <p className="text-red-500 text-sm mt-1">{errors.emailOrMobile}</p>
+                )}
+              </div>
+              <div>
+                <input
+                  name="password"
+                  type="password"
+                  placeholder="Password"
+                  value={formData.password}
+                  onChange={handleChange}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent"
+                />
+                {errors.password && (
+                  <p className="text-red-500 text-sm mt-1">{errors.password}</p>
+                )}
+              </div>
             </>
           )}
+          
           {step === "otp" && (
-            <>
+            <div>
               <input
                 name="otp"
-                placeholder="Enter OTP"
+                placeholder="Enter 6-digit OTP"
                 value={formData.otp}
                 onChange={handleChange}
-                className="w-full px-4 py-2 border rounded-lg"
+                maxLength={6}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent text-center text-lg tracking-widest"
               />
               {errors.otp && (
-                <p className="text-red-500 text-sm">{errors.otp}</p>
+                <p className="text-red-500 text-sm mt-1">{errors.otp}</p>
               )}
-            </>
+            </div>
           )}
 
           <Button
-            type="submit"
-            className="w-full bg-pink-600 hover:bg-pink-700 text-white py-2"
+            onClick={handleSubmit}
+            className="w-full bg-pink-600 hover:bg-pink-700 text-white py-2 px-4 rounded-lg transition-colors disabled:opacity-50"
             disabled={loading}
           >
             {loading
@@ -294,21 +331,41 @@ export default function AuthModal({
               ? "Login"
               : "Sign Up"}
           </Button>
-        </form>
-        <p className="mt-4 text-center text-gray-600">
-          {mode === "login"
-            ? "Don't have an account?"
-            : "Already have an account?"}
-          <button
-            onClick={() => {
-              setStep("form");
-              onSwitchMode(mode === "login" ? "signup" : "login");
-            }}
-            className="text-pink-600 hover:underline ml-1"
-          >
-            {mode === "login" ? "Sign Up" : "Login"}
-          </button>
-        </p>
+        </div>
+        
+        {step === "form" && (
+          <p className="mt-4 text-center text-gray-600">
+            {mode === "login"
+              ? "Don't have an account?"
+              : "Already have an account?"}
+            <button
+              onClick={() => {
+                setStep("form");
+                onSwitchMode(mode === "login" ? "signup" : "login");
+                // Clear form when switching modes
+                setFormData({
+                  fullName: "",
+                  mobile: "",
+                  email: "",
+                  emailOrMobile: "",
+                  password: "",
+                  otp: "",
+                });
+                setErrors({
+                  fullName: "",
+                  mobile: "",
+                  email: "",
+                  emailOrMobile: "",
+                  password: "",
+                  otp: "",
+                });
+              }}
+              className="text-pink-600 hover:underline ml-1 font-medium"
+            >
+              {mode === "login" ? "Sign Up" : "Login"}
+            </button>
+          </p>
+        )}
       </div>
     </div>
   );
