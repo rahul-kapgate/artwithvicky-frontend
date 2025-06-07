@@ -16,9 +16,10 @@ export default function AuthModal({
   const [formData, setFormData] = useState({
     fullName: "",
     mobile: "",
-    email: mode === "login" ? "" : "",
-    emailOrMobile: mode === "login" ? "" : "",
+    email: "",
+    emailOrMobile: "",
     password: "",
+    otp: "",
   });
   const [errors, setErrors] = useState({
     fullName: "",
@@ -26,7 +27,10 @@ export default function AuthModal({
     email: "",
     emailOrMobile: "",
     password: "",
+    otp: "",
   });
+  const [step, setStep] = useState<"form" | "otp">("form");
+  const [loading, setLoading] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -34,56 +38,114 @@ export default function AuthModal({
     setErrors((prev) => ({ ...prev, [name]: "" }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+  const validate = () => {
     let valid = true;
-    const newErrors = {
-      fullName: "",
-      mobile: "",
-      email: "",
-      emailOrMobile: "",
-      password: "",
-    };
+    const newErrors = { ...errors };
+    Object.keys(newErrors).forEach(
+      (key) => (newErrors[key as keyof typeof newErrors] = "")
+    );
 
-    if (mode === "signup") {
+    if (mode === "signup" && step === "form") {
       if (!formData.fullName) {
         newErrors.fullName = "Full Name is required";
         valid = false;
       }
-      if (!formData.mobile) {
-        newErrors.mobile = "Mobile Number is required";
-        valid = false;
-      } else if (!/^\d{10}$/.test(formData.mobile)) {
-        newErrors.mobile = "Mobile Number must be 10 digits";
+      if (!formData.mobile || !/^\d{10}$/.test(formData.mobile)) {
+        newErrors.mobile = "Valid Mobile Number is required";
         valid = false;
       }
-      if (!formData.email) {
-        newErrors.email = "Email is required";
-        valid = false;
-      } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-        newErrors.email = "Invalid email format";
+      if (!formData.email || !/\S+@\S+\.\S+/.test(formData.email)) {
+        newErrors.email = "Valid Email is required";
         valid = false;
       }
-    } else {
+    } else if (mode === "login") {
       if (!formData.emailOrMobile) {
         newErrors.emailOrMobile = "Email or Mobile is required";
         valid = false;
       }
     }
-    if (!formData.password) {
-      newErrors.password = "Password is required";
-      valid = false;
-    } else if (formData.password.length < 6) {
+
+    if (!formData.password || formData.password.length < 6) {
       newErrors.password = "Password must be at least 6 characters";
       valid = false;
     }
 
-    setErrors(newErrors);
+    if (step === "otp" && (!formData.otp || formData.otp.length !== 6)) {
+      newErrors.otp = "Enter a valid 6-digit OTP";
+      valid = false;
+    }
 
-    if (valid) {
-      // Handle form submission (e.g., API call)
-      console.log(`${mode} submitted:`, formData);
-      onClose(); // Close modal on successful submission
+    setErrors(newErrors);
+    return valid;
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!validate()) return;
+    setLoading(true);
+
+    try {
+      if (mode === "signup") {
+        if (step === "form") {
+          await fetch(
+            "https://artwithvicky-backend.onrender.com/api/users/signup/initiate",
+            {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                fullName: formData.fullName,
+                mobile: formData.mobile,
+                email: formData.email,
+                password: formData.password,
+              }),
+            }
+          );
+          setStep("otp");
+        } else {
+          const res = await fetch(
+            "https://artwithvicky-backend.onrender.com/api/users/signup/verify",
+            {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                email: formData.email,
+                otp: formData.otp,
+              }),
+            }
+          );
+          if (res.ok) {
+            // auto login after signup
+            await loginHandler(formData.email, formData.password);
+          }
+        }
+      } else {
+        await loginHandler(formData.emailOrMobile, formData.password);
+      }
+    } catch (err) {
+      console.error("Error submitting form:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const loginHandler = async (emailOrMobile: string, password: string) => {
+    const res = await fetch(
+      "https://artwithvicky-backend.onrender.com/api/users/login",
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: emailOrMobile,
+          password,
+        }),
+      }
+    );
+    const data = await res.json();
+    if (res.ok) {
+      localStorage.setItem("token", data.token);
+      onClose();
+    } else {
+      alert(data.message || "Login failed");
     }
   };
 
@@ -99,131 +161,110 @@ export default function AuthModal({
         <h2 className="text-2xl font-bold text-pink-600 mb-6 text-center">
           {mode === "login"
             ? "Login to Artistic Vicky"
-            : "Sign Up for Artistic Vicky"}
+            : step === "form"
+            ? "Sign Up for Artistic Vicky"
+            : "Verify OTP"}
         </h2>
         <form onSubmit={handleSubmit} className="space-y-4">
-          {mode === "signup" && (
+          {mode === "signup" && step === "form" && (
             <>
-              <div>
-                <label
-                  htmlFor="fullName"
-                  className="block text-sm font-medium text-gray-700"
-                >
-                  Full Name
-                </label>
-                <input
-                  type="text"
-                  id="fullName"
-                  name="fullName"
-                  value={formData.fullName}
-                  onChange={handleChange}
-                  className="mt-1 w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-pink-500 focus:border-pink-500"
-                  placeholder="Enter your full name"
-                />
-                {errors.fullName && (
-                  <p className="text-red-500 text-sm mt-1">{errors.fullName}</p>
-                )}
-              </div>
-              <div>
-                <label
-                  htmlFor="mobile"
-                  className="block text-sm font-medium text-gray-700"
-                >
-                  Mobile Number
-                </label>
-                <input
-                  type="text"
-                  id="mobile"
-                  name="mobile"
-                  value={formData.mobile}
-                  onChange={handleChange}
-                  className="mt-1 w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-pink-500 focus:border-pink-500"
-                  placeholder="Enter your mobile number"
-                />
-                {errors.mobile && (
-                  <p className="text-red-500 text-sm mt-1">{errors.mobile}</p>
-                )}
-              </div>
-              <div>
-                <label
-                  htmlFor="email"
-                  className="block text-sm font-medium text-gray-700"
-                >
-                  Email
-                </label>
-                <input
-                  type="email"
-                  id="email"
-                  name="email"
-                  value={formData.email}
-                  onChange={handleChange}
-                  className="mt-1 w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-pink-500 focus:border-pink-500"
-                  placeholder="Enter your email"
-                />
-                {errors.email && (
-                  <p className="text-red-500 text-sm mt-1">{errors.email}</p>
-                )}
-              </div>
+              <input
+                name="fullName"
+                placeholder="Full Name"
+                value={formData.fullName}
+                onChange={handleChange}
+                className="w-full px-4 py-2 border rounded-lg"
+              />
+              {errors.fullName && (
+                <p className="text-red-500 text-sm">{errors.fullName}</p>
+              )}
+              <input
+                name="mobile"
+                placeholder="Mobile"
+                value={formData.mobile}
+                onChange={handleChange}
+                className="w-full px-4 py-2 border rounded-lg"
+              />
+              {errors.mobile && (
+                <p className="text-red-500 text-sm">{errors.mobile}</p>
+              )}
+              <input
+                name="email"
+                type="email"
+                placeholder="Email"
+                value={formData.email}
+                onChange={handleChange}
+                className="w-full px-4 py-2 border rounded-lg"
+              />
+              {errors.email && (
+                <p className="text-red-500 text-sm">{errors.email}</p>
+              )}
             </>
           )}
           {mode === "login" && (
-            <div>
-              <label
-                htmlFor="emailOrMobile"
-                className="block text-sm font-medium text-gray-700"
-              >
-                Email or Mobile
-              </label>
+            <>
               <input
-                type="text"
-                id="emailOrMobile"
                 name="emailOrMobile"
+                placeholder="Email or Mobile"
                 value={formData.emailOrMobile}
                 onChange={handleChange}
-                className="mt-1 w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-pink-500 focus:border-pink-500"
-                placeholder="Enter email or mobile number"
+                className="w-full px-4 py-2 border rounded-lg"
               />
               {errors.emailOrMobile && (
-                <p className="text-red-500 text-sm mt-1">
-                  {errors.emailOrMobile}
-                </p>
+                <p className="text-red-500 text-sm">{errors.emailOrMobile}</p>
               )}
-            </div>
+            </>
           )}
-          <div>
-            <label
-              htmlFor="password"
-              className="block text-sm font-medium text-gray-700"
-            >
-              Password
-            </label>
-            <input
-              type="password"
-              id="password"
-              name="password"
-              value={formData.password}
-              onChange={handleChange}
-              className="mt-1 w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-pink-500 focus:border-pink-500"
-              placeholder="Enter your password"
-            />
-            {errors.password && (
-              <p className="text-red-500 text-sm mt-1">{errors.password}</p>
-            )}
-          </div>
+          {step === "otp" && (
+            <>
+              <input
+                name="otp"
+                placeholder="Enter OTP"
+                value={formData.otp}
+                onChange={handleChange}
+                className="w-full px-4 py-2 border rounded-lg"
+              />
+              {errors.otp && (
+                <p className="text-red-500 text-sm">{errors.otp}</p>
+              )}
+            </>
+          )}
+          <input
+            name="password"
+            type="password"
+            placeholder="Password"
+            value={formData.password}
+            onChange={handleChange}
+            className="w-full px-4 py-2 border rounded-lg"
+          />
+          {errors.password && (
+            <p className="text-red-500 text-sm">{errors.password}</p>
+          )}
+
           <Button
             type="submit"
             className="w-full bg-pink-600 hover:bg-pink-700 text-white py-2"
+            disabled={loading}
           >
-            {mode === "login" ? "Login" : "Sign Up"}
+            {loading
+              ? "Please wait..."
+              : step === "otp"
+              ? "Verify OTP"
+              : mode === "login"
+              ? "Login"
+              : "Sign Up"}
           </Button>
         </form>
         <p className="mt-4 text-center text-gray-600">
           {mode === "login"
             ? "Don't have an account?"
-            : "Already have an account?"}{" "}
+            : "Already have an account?"}
           <button
-            onClick={() => onSwitchMode(mode === "login" ? "signup" : "login")}
-            className="text-pink-600 hover:underline"
+            onClick={() => {
+              setStep("form");
+              onSwitchMode(mode === "login" ? "signup" : "login");
+            }}
+            className="text-pink-600 hover:underline ml-1"
           >
             {mode === "login" ? "Sign Up" : "Login"}
           </button>
