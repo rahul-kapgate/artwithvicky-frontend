@@ -1,18 +1,14 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { X } from "lucide-react";
-
-interface User {
-  userId: string;
-  fullName: string;
-  email: string;
-}
+import { useAuth } from "@/context/AuthContext";
+import { toast } from "react-toastify";
 
 interface AuthModalProps {
   mode: "login" | "signup";
   onClose: () => void;
   onSwitchMode: (newMode: "login" | "signup") => void;
-  onLoginSuccess: (user: User) => void;
+  onLoginSuccess?: () => void; // Added prop
 }
 
 export default function AuthModal({
@@ -29,6 +25,7 @@ export default function AuthModal({
     password: "",
     otp: "",
   });
+
   const [errors, setErrors] = useState({
     fullName: "",
     mobile: "",
@@ -37,8 +34,10 @@ export default function AuthModal({
     password: "",
     otp: "",
   });
+
   const [step, setStep] = useState<"form" | "otp">("form");
   const [loading, setLoading] = useState(false);
+  const { login } = useAuth();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -59,7 +58,7 @@ export default function AuthModal({
         valid = false;
       }
       if (!formData.mobile || !/^\d{10}$/.test(formData.mobile)) {
-        newErrors.mobile = "Valid Mobile Number is required";
+        newErrors.mobile = "Valid 10-digit Mobile Number is required";
         valid = false;
       }
       if (!formData.email || !/\S+@\S+\.\S+/.test(formData.email)) {
@@ -92,35 +91,56 @@ export default function AuthModal({
 
   const loginHandler = async (emailOrMobile: string, password: string) => {
     try {
+      // Determine if emailOrMobile is an email or mobile
+      const isEmail = /\S+@\S+\.\S+/.test(emailOrMobile);
+      const payload = isEmail
+        ? { email: emailOrMobile, password }
+        : { mobile: emailOrMobile, password };
+
       const res = await fetch(
         "https://artwithvicky-backend.onrender.com/api/users/login",
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            email: emailOrMobile,
-            password,
-          }),
+          body: JSON.stringify(payload),
         }
       );
+
       const data = await res.json();
       if (res.ok) {
-        // Store token in memory instead of localStorage for demo
-        onLoginSuccess({
-          userId: data.userId,
-          fullName: data.fullName,
-          email: data.email,
-        });
-        // Simulate success toast
-        console.log("Login successful!");
+        localStorage.setItem("accessToken", data.accessToken);
+        localStorage.setItem("refreshToken", data.refreshToken);
+
+        login(
+          {
+            userId: data.userId,
+            fullName: data.fullName,
+            email: data.email,
+          },
+          {
+            accessToken: data.accessToken,
+            refreshToken: data.refreshToken,
+          }
+        );
+
+        toast.success("Login successful!");
+        onLoginSuccess?.(); // Call onLoginSuccess
         onClose();
       } else {
-        console.error(data.message || "Login failed");
-        setErrors(prev => ({ ...prev, emailOrMobile: data.message || "Login failed" }));
+        const errorMsg = data.message || "Invalid credentials";
+        toast.error(errorMsg);
+        setErrors((prev) => ({
+          ...prev,
+          emailOrMobile: errorMsg,
+        }));
       }
     } catch (error) {
       console.error("Network error:", error);
-      setErrors(prev => ({ ...prev, emailOrMobile: "Network error, please try again" }));
+      toast.error("Network error, please try again");
+      setErrors((prev) => ({
+        ...prev,
+        emailOrMobile: "Network error, please try again",
+      }));
     }
   };
 
@@ -146,9 +166,12 @@ export default function AuthModal({
           );
           if (res.ok) {
             setStep("otp");
+            toast.info("OTP sent to your email");
           } else {
             const data = await res.json();
-            console.error("Signup initiation failed:", data.message);
+            const errorMsg = data.message || "Signup initiation failed";
+            toast.error(errorMsg);
+            console.error("Signup initiation failed:", errorMsg);
           }
         } else {
           const res = await fetch(
@@ -163,8 +186,7 @@ export default function AuthModal({
             }
           );
           if (res.ok) {
-            console.log("Signup successful! Please log in.");
-            // Switch to login mode and reset form
+            toast.success("Signup successful! Please log in.");
             onSwitchMode("login");
             setStep("form");
             setFormData({
@@ -185,8 +207,9 @@ export default function AuthModal({
             });
           } else {
             const data = await res.json();
-            console.error("OTP verification failed:", data.message);
-            setErrors(prev => ({ ...prev, otp: "OTP verification failed" }));
+            const errorMsg = data.message || "OTP verification failed";
+            toast.error(errorMsg);
+            setErrors((prev) => ({ ...prev, otp: errorMsg }));
           }
         }
       } else {
@@ -194,7 +217,11 @@ export default function AuthModal({
       }
     } catch (err) {
       console.error("Error submitting form:", err);
-      setErrors(prev => ({ ...prev, emailOrMobile: "Network error, please try again later." }));
+      toast.error("Network error, please try again later");
+      setErrors((prev) => ({
+        ...prev,
+        emailOrMobile: "Network error, please try again later",
+      }));
     } finally {
       setLoading(false);
     }
@@ -216,6 +243,7 @@ export default function AuthModal({
             ? "Sign Up for Artistic Vicky"
             : "Verify OTP"}
         </h2>
+
         <div className="space-y-4">
           {mode === "signup" && step === "form" && (
             <>
@@ -246,7 +274,6 @@ export default function AuthModal({
               <div>
                 <input
                   name="email"
-                  type="email"
                   placeholder="Email"
                   value={formData.email}
                   onChange={handleChange}
@@ -254,36 +281,6 @@ export default function AuthModal({
                 />
                 {errors.email && (
                   <p className="text-red-500 text-sm mt-1">{errors.email}</p>
-                )}
-              </div>
-              <div>
-                <input
-                  name="password"
-                  type="password"
-                  placeholder="Password (min 6 characters)"
-                  value={formData.password}
-                  onChange={handleChange}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent"
-                />
-                {errors.password && (
-                  <p className="text-red-500 text-sm mt-1">{errors.password}</p>
-                )}
-              </div>
-            </>
-          )}
-          
-          {mode === "login" && step === "form" && (
-            <>
-              <div>
-                <input
-                  name="emailOrMobile"
-                  placeholder="Email or Mobile Number"
-                  value={formData.emailOrMobile}
-                  onChange={handleChange}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent"
-                />
-                {errors.emailOrMobile && (
-                  <p className="text-red-500 text-sm mt-1">{errors.emailOrMobile}</p>
                 )}
               </div>
               <div>
@@ -301,7 +298,39 @@ export default function AuthModal({
               </div>
             </>
           )}
-          
+
+          {mode === "login" && step === "form" && (
+            <>
+              <div>
+                <input
+                  name="emailOrMobile"
+                  placeholder="Email or Mobile Number"
+                  value={formData.emailOrMobile}
+                  onChange={handleChange}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent"
+                />
+                {errors.emailOrMobile && (
+                  <p className="text-red-500 text-sm mt-1">
+                    {errors.emailOrMobile}
+                  </p>
+                )}
+              </div>
+              <div>
+                <input
+                  name="password"
+                  type="password"
+                  placeholder="Password"
+                  value={formData.password}
+                  onChange={handleChange}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent"
+                />
+                {errors.password && (
+                  <p className="text-red-500 text-sm mt-1">{errors.password}</p>
+                )}
+              </div>
+            </>
+          )}
+
           {step === "otp" && (
             <div>
               <input
@@ -332,7 +361,7 @@ export default function AuthModal({
               : "Sign Up"}
           </Button>
         </div>
-        
+
         {step === "form" && (
           <p className="mt-4 text-center text-gray-600">
             {mode === "login"
@@ -342,7 +371,6 @@ export default function AuthModal({
               onClick={() => {
                 setStep("form");
                 onSwitchMode(mode === "login" ? "signup" : "login");
-                // Clear form when switching modes
                 setFormData({
                   fullName: "",
                   mobile: "",
