@@ -5,7 +5,7 @@ const courses = [
   {
     title: "MAH AAC CET Entrance Exam Preparation",
     description:
-      "Get fully prepared for the MAH AAC CET exam with expert-led training. This course covers key areas like Object Drawing, 2D Design, Mirror Drawing, and General Knowledge (GK), with full access to premium study resources.",
+      "Get fully prepared for the MAH AAC CET exam with expert-led training. This course covers key areas like Object Drawing, 2D Design, Memory Drawing, and General Knowledge (GK), with full access to premium study resources.",
     duration: "6 Weeks",
     level: "Advanced",
     modules: [
