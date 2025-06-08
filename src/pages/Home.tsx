@@ -29,7 +29,7 @@ const artworks = [
     imageUrl: "/images/20240417_164034.jpg",
   },
   {
-    title: "Coconut Object – Namaste",
+    title: "Coconut – ObjectDrawing",
     description: "",
     imageUrl: "/images/20250409_132807.jpg",
   },

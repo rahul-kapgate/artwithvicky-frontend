@@ -8,6 +8,8 @@ const courses = [
       "Get fully prepared for the MAH AAC CET exam with expert-led training. This course covers key areas like Object Drawing, 2D Design, Memory Drawing, and General Knowledge (GK), with full access to premium study resources.",
     duration: "6 Weeks",
     level: "Advanced",
+    originalPrice: 7999,
+    discountedPrice: 4999,
     modules: [
       "Object Drawing",
       "2D Designs",
@@ -73,14 +75,21 @@ export default function Courses() {
                   </ul>
                 </div>
 
-                {/* <div className="text-sm text-gray-500 pt-2">
-                  <span className="block">🕒 Duration: {course.duration}</span>
-                  <span className="block">📈 Level: {course.level}</span>
-                </div> */}
-
-                {/* test */}
-
                 <div className="pt-4">
+                  <div className="bg-pink-50 border border-pink-200 rounded-xl p-4 mb-4 text-center">
+                    <div className="text-gray-500 text-sm line-through">
+                      ₹{course.originalPrice}
+                    </div>
+                    <div className="text-2xl font-extrabold text-green-600">
+                      ₹{course.discountedPrice}
+                      <span className="ml-2 text-sm font-medium text-gray-600">
+                        only
+                      </span>
+                    </div>
+                    <span className="inline-block mt-2 text-xs text-white bg-pink-500 px-3 py-1 rounded-full shadow-sm">
+                      🎉 Limited Time Offer
+                    </span>
+                  </div>
                   <Button className="w-full text-base font-medium py-2">
                     Enroll Now
                   </Button>
