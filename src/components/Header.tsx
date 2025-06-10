@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { Menu, X } from "lucide-react";
+import { Menu, X, Settings } from "lucide-react";
 import AuthModal from "../pages/AuthModal";
 import { useAuth } from "@/context/AuthContext";
 
@@ -8,7 +8,7 @@ export default function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
   const [modalMode, setModalMode] = useState<"login" | "signup">("login");
-  const { user, logout } = useAuth(); // Use AuthContext
+  const { user, logout, isAdmin } = useAuth(); // Added isAdmin
   const location = useLocation();
 
   // Scroll to hash target after navigating
@@ -33,6 +33,9 @@ export default function Header() {
 
   const buttonClass =
     "bg-pink-600 text-white px-3 py-1.5 rounded-full hover:bg-pink-700 transition-colors shadow-sm text-sm";
+
+  const adminButtonClass =
+    "bg-orange-600 text-white px-3 py-1.5 rounded-full hover:bg-orange-700 transition-colors shadow-sm text-sm flex items-center gap-1";
 
   const openModal = (mode: "login" | "signup") => {
     setModalMode(mode);
@@ -76,6 +79,13 @@ export default function Header() {
                 <div className="w-8 h-8 rounded-full bg-pink-600 text-white flex items-center justify-center font-bold text-lg">
                   {user.fullName.charAt(0).toUpperCase()}
                 </div>
+                {/* Admin Panel Link - Only visible to admins */}
+                {isAdmin() && (
+                  <Link to="/admin" className={adminButtonClass}>
+                    <Settings className="w-4 h-4" />
+                    Admin Panel
+                  </Link>
+                )}
                 <button onClick={logout} className={buttonClass}>
                   Logout
                 </button>
@@ -105,6 +115,13 @@ export default function Header() {
                 <div className="w-8 h-8 rounded-full bg-pink-600 text-white flex items-center justify-center font-bold text-lg">
                   {user.fullName.charAt(0).toUpperCase()}
                 </div>
+                {/* Admin Panel Link for Mobile - Only visible to admins */}
+                {isAdmin() && (
+                  <Link to="/admin" className={adminButtonClass}>
+                    <Settings className="w-4 h-4" />
+                    Admin
+                  </Link>
+                )}
                 <button onClick={logout} className={buttonClass}>
                   Logout
                 </button>
@@ -177,6 +194,17 @@ export default function Header() {
               >
                 Courses
               </Link>
+              {/* Admin Panel Link in Mobile Menu - Only visible to admins */}
+              {user && isAdmin() && (
+                <Link
+                  to="/admin"
+                  onClick={() => setMenuOpen(false)}
+                  className="text-orange-600 hover:text-orange-700 transition-colors flex items-center gap-2"
+                >
+                  <Settings className="w-4 h-4" />
+                  Admin Panel
+                </Link>
+              )}
             </nav>
           </div>
         )}

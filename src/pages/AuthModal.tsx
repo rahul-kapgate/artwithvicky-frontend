@@ -8,7 +8,7 @@ interface AuthModalProps {
   mode: "login" | "signup";
   onClose: () => void;
   onSwitchMode: (newMode: "login" | "signup") => void;
-  onLoginSuccess?: () => void; // Added prop
+  onLoginSuccess?: () => void;
 }
 
 export default function AuthModal({
@@ -116,6 +116,8 @@ export default function AuthModal({
             userId: data.userId,
             fullName: data.fullName,
             email: data.email,
+            role: data.role, // Include role in login context
+            authorizedCourses: data.authorizedCourses,
           },
           {
             accessToken: data.accessToken,
@@ -124,7 +126,15 @@ export default function AuthModal({
         );
 
         toast.success("Login successful!");
-        onLoginSuccess?.(); // Call onLoginSuccess
+
+        if (data.role === "admin") {
+          toast.success("Welcome Admin!");
+          // Do nothing — don't redirect
+        } else {
+          onLoginSuccess?.(); // Call callback only for non-admins
+        }
+
+
         onClose();
       } else {
         const errorMsg = data.message || "Invalid credentials";

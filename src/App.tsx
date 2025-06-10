@@ -5,6 +5,7 @@ import Courses from "./pages/Courses";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { AuthProvider } from "./context/AuthContext.tsx"
+import AdminHome from "./pages/AdminPanel/AdminHome.tsx";
 
 function App() {
   return (
@@ -26,6 +27,7 @@ function App() {
           <Route path="/" element={<Layout />}>
             <Route index element={<Home />} />
             <Route path="/courses" element={<Courses />} />
+            <Route path="/admin" element={<AdminHome />} />
           </Route>
         </Routes>
       </Router>

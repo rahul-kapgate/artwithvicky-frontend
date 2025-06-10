@@ -4,6 +4,8 @@ interface User {
   userId: string;
   fullName: string;
   email: string;
+  role?: string;
+  authorizedCourses?: string[];
 }
 
 interface AuthContextType {
@@ -13,6 +15,7 @@ interface AuthContextType {
     tokens: { accessToken: string; refreshToken: string }
   ) => void;
   logout: () => void;
+  isAdmin: () => boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -42,8 +45,12 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     localStorage.clear();
   };
 
+  const isAdmin = () => {
+    return user?.role === "admin";
+  };
+
   return (
-    <AuthContext.Provider value={{ user, login, logout }}>
+    <AuthContext.Provider value={{ user, login, logout, isAdmin }}>
       {children}
     </AuthContext.Provider>
   );
