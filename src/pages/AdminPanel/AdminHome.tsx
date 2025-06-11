@@ -1,13 +1,19 @@
 import { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+import { Badge } from "@/components/ui/badge"; 
+import { Button } from "@/components/ui/button";
 import { Users, Mail, BookOpen, AlertCircle } from "lucide-react";
+
+interface Course {
+  _id: string;
+  title: string;
+}
 
 interface User {
   _id: string;
   fullName: string;
   email: string;
-  authorizedCourses: string[];
+  authorizedCourses: Course[];
 }
 
 function AdminHome() {
@@ -49,6 +55,97 @@ function AdminHome() {
       setError(err instanceof Error ? err.message : "Failed to fetch users");
     } finally {
       setLoading(false);
+    }
+  };
+
+  const assignCourse = async (userId: string, courseId: string) => {
+    try {
+      const token = localStorage.getItem("accessToken");
+      if (!token) {
+        setError("No access token found");
+        return;
+      }
+
+      const response = await fetch(
+        "https://artwithvicky-backend.onrender.com/api/admin/assign-courses",
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            userId,
+            courseIds: [courseId],
+          }),
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error(`Failed to assign course: ${response.status}`);
+      }
+
+      // Optimistically update the state (assuming the backend returns the course object)
+      setUsers((prevUsers) =>
+        prevUsers.map((user) =>
+          user._id === userId
+            ? {
+                ...user,
+                authorizedCourses: [
+                  ...user.authorizedCourses,
+                  { _id: courseId, title: `Course ${courseId}` }, // Placeholder title
+                ],
+              }
+            : user
+        )
+      );
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to assign course");
+    }
+  };
+
+  const removeCourse = async (userId: string, courseId: string) => {
+    try {
+      const token = localStorage.getItem("accessToken");
+      if (!token) {
+        setError("No access token found");
+        return;
+      }
+
+      const response = await fetch(
+        "https://artwithvicky-backend.onrender.com/api/admin/remove-courses",
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            userId,
+            courseIds: [courseId],
+          }),
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error(`Failed to remove course: ${response.status}`);
+      }
+
+      // Update the user's authorized courses in the state
+      setUsers((prevUsers) =>
+        prevUsers.map((user) =>
+          user._id === userId
+            ? {
+                ...user,
+                authorizedCourses: user.authorizedCourses.filter(
+                  (course) => course._id !== courseId
+                ),
+              }
+            : user
+        )
+      );
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to remove course");
     }
   };
 
@@ -164,14 +261,34 @@ function AdminHome() {
                               <Badge
                                 key={index}
                                 variant="outline"
-                                className="text-xs"
+                                className="text-xs flex items-center"
                               >
-                                {course}
+                                {course.title} {/* Display course title */}
+                                <button
+                                  onClick={() =>
+                                    removeCourse(user._id, course._id)
+                                  }
+                                  className="ml-2 text-red-500 hover:text-red-700"
+                                >
+                                  ×
+                                </button>
                               </Badge>
                             ))}
                           </div>
                         </div>
                       )}
+
+                      {/* Assign Course Button */}
+                      <div className="mt-4">
+                        <Button
+                          onClick={() =>
+                            assignCourse(user._id, "6848338d4ef958e38643f3c3")
+                          }
+                          className="w-full bg-pink-600 hover:bg-pink-700 text-white"
+                        >
+                          Assign Course
+                        </Button>
+                      </div>
                     </div>
                   </CardContent>
                 </Card>
