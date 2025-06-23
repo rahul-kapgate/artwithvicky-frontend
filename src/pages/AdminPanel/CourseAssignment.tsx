@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
-import { Badge } from "@/components/ui/badge";
+// import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Users, Mail, BookOpen, AlertCircle } from "lucide-react";
+// import { Users, Mail, BookOpen, AlertCircle } from "lucide-react";
+import { AlertCircle } from "lucide-react";
 
 interface Course {
   _id: string;
