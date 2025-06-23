@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
-import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge"; 
+import { Card } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Users, Mail, BookOpen, AlertCircle } from "lucide-react";
 
@@ -85,7 +85,6 @@ function AdminHome() {
         throw new Error(`Failed to assign course: ${response.status}`);
       }
 
-      // Optimistically update the state (assuming the backend returns the course object)
       setUsers((prevUsers) =>
         prevUsers.map((user) =>
           user._id === userId
@@ -93,7 +92,7 @@ function AdminHome() {
                 ...user,
                 authorizedCourses: [
                   ...user.authorizedCourses,
-                  { _id: courseId, title: `Course ${courseId}` }, // Placeholder title
+                  { _id: courseId, title: `Course ${courseId}` },
                 ],
               }
             : user
@@ -131,7 +130,6 @@ function AdminHome() {
         throw new Error(`Failed to remove course: ${response.status}`);
       }
 
-      // Update the user's authorized courses in the state
       setUsers((prevUsers) =>
         prevUsers.map((user) =>
           user._id === userId
@@ -194,11 +192,11 @@ function AdminHome() {
         </div>
       </section>
 
-      {/* Users Section */}
+      {/* Users Table Section */}
       <section className="py-16 bg-white px-4">
-        <div className="max-w-6xl mx-auto">
+        <div className="max-w-7xl mx-auto">
           <h2 className="text-3xl font-semibold text-center mb-10">
-            Registered Users
+            Registered Users & Courses
           </h2>
 
           {users.length === 0 ? (
@@ -207,92 +205,70 @@ function AdminHome() {
               <p className="text-gray-500 text-lg">No users found</p>
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {users.map((user) => (
-                <Card
-                  key={user._id}
-                  className="rounded-2xl shadow-md hover:shadow-lg transition-shadow duration-300"
-                >
-                  <CardContent className="p-6">
-                    <div className="flex items-start justify-between mb-4">
-                      <div className="flex-1">
-                        <h3 className="text-xl font-semibold text-gray-800 mb-2">
-                          {user.fullName}
-                        </h3>
-                        <div className="flex items-center space-x-2 text-gray-600 mb-3">
-                          <Mail className="w-4 h-4" />
-                          <span className="text-sm">{user.email}</span>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="space-y-3">
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm text-gray-500">User ID:</span>
-                        <span className="text-xs font-mono bg-gray-100 px-2 py-1 rounded">
-                          {user._id.slice(-8)}
-                        </span>
-                      </div>
-
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm text-gray-500">
-                          Authorized Courses:
-                        </span>
-                        <div className="flex items-center space-x-1">
-                          <BookOpen className="w-4 h-4 text-gray-400" />
-                          <Badge
-                            variant={
-                              user.authorizedCourses.length > 0
-                                ? "default"
-                                : "secondary"
-                            }
-                            className="text-xs"
-                          >
-                            {user.authorizedCourses.length}
-                          </Badge>
-                        </div>
-                      </div>
-
-                      {user.authorizedCourses.length > 0 && (
-                        <div className="mt-3 pt-3 border-t border-gray-100">
-                          <p className="text-xs text-gray-500 mb-2">Courses:</p>
-                          <div className="flex flex-wrap gap-1">
-                            {user.authorizedCourses.map((course, index) => (
-                              <Badge
-                                key={index}
-                                variant="outline"
-                                className="text-xs flex items-center"
+            <div className="overflow-x-auto">
+              <table className="min-w-full border border-gray-200 text-sm text-left rounded-lg overflow-hidden">
+                <thead className="bg-gray-100 text-gray-600">
+                  <tr>
+                    <th className="px-4 py-3">#</th>
+                    <th className="px-4 py-3">Full Name</th>
+                    <th className="px-4 py-3">Email</th>
+                    <th className="px-4 py-3">User ID</th>
+                    <th className="px-4 py-3">Authorized Courses</th>
+                    <th className="px-4 py-3 text-center">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {users.map((user, index) => (
+                    <tr
+                      key={user._id}
+                      className="border-t border-gray-200 hover:bg-gray-50"
+                    >
+                      <td className="px-4 py-3">{index + 1}</td>
+                      <td className="px-4 py-3">{user.fullName}</td>
+                      <td className="px-4 py-3">{user.email}</td>
+                      <td className="px-4 py-3 font-mono text-xs">
+                        {user._id.slice(-8)}
+                      </td>
+                      <td className="px-4 py-3">
+                        {user.authorizedCourses.length > 0 ? (
+                          <ul className="list-disc list-inside space-y-1">
+                            {user.authorizedCourses.map((course) => (
+                              <li
+                                key={course._id}
+                                className="flex justify-between"
                               >
-                                {course.title} {/* Display course title */}
+                                <span>{course.title}</span>
                                 <button
                                   onClick={() =>
                                     removeCourse(user._id, course._id)
                                   }
-                                  className="ml-2 text-red-500 hover:text-red-700"
+                                  className="ml-4 text-red-500 text-xs hover:underline"
                                 >
-                                  ×
+                                  Remove
                                 </button>
-                              </Badge>
+                              </li>
                             ))}
-                          </div>
-                        </div>
-                      )}
-
-                      {/* Assign Course Button */}
-                      <div className="mt-4">
+                          </ul>
+                        ) : (
+                          <span className="text-gray-400 italic">
+                            No courses
+                          </span>
+                        )}
+                      </td>
+                      <td className="px-4 py-3 text-center">
                         <Button
                           onClick={() =>
                             assignCourse(user._id, "6848338d4ef958e38643f3c3")
                           }
-                          className="w-full bg-pink-600 hover:bg-pink-700 text-white"
+                          className="bg-pink-600 hover:bg-pink-700 text-white text-xs"
                         >
-                          Assign Course
+                          Assign Default Course
                         </Button>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
           )}
         </div>
