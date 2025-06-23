@@ -1,0 +1,230 @@
+import { useState, useEffect } from "react";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Users, Mail, BookOpen, AlertCircle } from "lucide-react";
+
+interface Course {
+  _id: string;
+  title: string;
+}
+
+interface User {
+  _id: string;
+  fullName: string;
+  email: string;
+  authorizedCourses: Course[];
+}
+
+function CourseAssignment() {
+  const [users, setUsers] = useState<User[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    fetchUsers();
+  }, []);
+
+  const fetchUsers = async () => {
+    try {
+      const token = localStorage.getItem("accessToken");
+
+      if (!token) {
+        setError("No access token found");
+        setLoading(false);
+        return;
+      }
+
+      const response = await fetch(
+        "https://artwithvicky-backend.onrender.com/api/admin/users",
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      setUsers(data);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to fetch users");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const assignCourse = async (userId: string, courseId: string) => {
+    try {
+      const token = localStorage.getItem("accessToken");
+      if (!token) {
+        setError("No access token found");
+        return;
+      }
+
+      const response = await fetch(
+        "https://artwithvicky-backend.onrender.com/api/admin/assign-courses",
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            userId,
+            courseIds: [courseId],
+          }),
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error(`Failed to assign course: ${response.status}`);
+      }
+
+      setUsers((prevUsers) =>
+        prevUsers.map((user) =>
+          user._id === userId
+            ? {
+                ...user,
+                authorizedCourses: [
+                  ...user.authorizedCourses,
+                  { _id: courseId, title: `Course ${courseId}` },
+                ],
+              }
+            : user
+        )
+      );
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to assign course");
+    }
+  };
+
+  const removeCourse = async (userId: string, courseId: string) => {
+    try {
+      const token = localStorage.getItem("accessToken");
+      if (!token) {
+        setError("No access token found");
+        return;
+      }
+
+      const response = await fetch(
+        "https://artwithvicky-backend.onrender.com/api/admin/remove-courses",
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            userId,
+            courseIds: [courseId],
+          }),
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error(`Failed to remove course: ${response.status}`);
+      }
+
+      setUsers((prevUsers) =>
+        prevUsers.map((user) =>
+          user._id === userId
+            ? {
+                ...user,
+                authorizedCourses: user.authorizedCourses.filter(
+                  (course) => course._id !== courseId
+                ),
+              }
+            : user
+        )
+      );
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to remove course");
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="flex flex-col items-center justify-center py-10">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-pink-600 mb-4" />
+        <p className="text-gray-600">Loading users...</p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="text-center py-10">
+        <AlertCircle className="h-10 w-10 text-red-500 mx-auto mb-2" />
+        <p className="text-lg text-red-600 font-medium">Error:</p>
+        <p className="text-gray-600">{error}</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="overflow-x-auto">
+      <table className="min-w-full border border-gray-200 text-sm text-left rounded-lg overflow-hidden">
+        <thead className="bg-gray-100 text-gray-600">
+          <tr>
+            <th className="px-4 py-3">#</th>
+            <th className="px-4 py-3">Full Name</th>
+            <th className="px-4 py-3">Email</th>
+            <th className="px-4 py-3">User ID</th>
+            <th className="px-4 py-3">Authorized Courses</th>
+            <th className="px-4 py-3 text-center">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {users.map((user, index) => (
+            <tr
+              key={user._id}
+              className="border-t border-gray-200 hover:bg-gray-50"
+            >
+              <td className="px-4 py-3">{index + 1}</td>
+              <td className="px-4 py-3">{user.fullName}</td>
+              <td className="px-4 py-3">{user.email}</td>
+              <td className="px-4 py-3 font-mono text-xs">
+                {user._id.slice(-8)}
+              </td>
+              <td className="px-4 py-3">
+                {user.authorizedCourses.length > 0 ? (
+                  <ul className="list-disc list-inside space-y-1">
+                    {user.authorizedCourses.map((course) => (
+                      <li key={course._id} className="flex justify-between">
+                        <span>{course.title}</span>
+                        <button
+                          onClick={() => removeCourse(user._id, course._id)}
+                          className="ml-4 text-red-500 text-xs hover:underline"
+                        >
+                          Remove
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <span className="text-gray-400 italic">No courses</span>
+                )}
+              </td>
+              <td className="px-4 py-3 text-center">
+                <Button
+                  onClick={() =>
+                    assignCourse(user._id, "6848338d4ef958e38643f3c3")
+                  }
+                  className="bg-pink-600 hover:bg-pink-700 text-white text-xs"
+                >
+                  Assign Default Course
+                </Button>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
+export default CourseAssignment;
