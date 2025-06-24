@@ -1,8 +1,7 @@
 import { useState, useEffect } from "react";
-// import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-// import { Users, Mail, BookOpen, AlertCircle } from "lucide-react";
 import { AlertCircle } from "lucide-react";
+import { fetchWithAuth } from "../../utils/fetchWithAuth.ts";
 
 interface Course {
   _id: string;
@@ -16,9 +15,9 @@ interface User {
   authorizedCourses: Course[];
 }
 
-function CourseAssignment() {
+const CourseAssignment: React.FC = () => {
   const [users, setUsers] = useState<User[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -27,29 +26,10 @@ function CourseAssignment() {
 
   const fetchUsers = async () => {
     try {
-      const token = localStorage.getItem("accessToken");
-
-      if (!token) {
-        setError("No access token found");
-        setLoading(false);
-        return;
-      }
-
-      const response = await fetch(
-        "https://artwithvicky-backend.onrender.com/api/admin/users",
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-        }
+      const response = await fetchWithAuth(
+        "https://artwithvicky-backend.onrender.com/api/admin/users"
       );
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      const data = await response.json();
+      const data: User[] = await response.json();
       setUsers(data);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to fetch users");
@@ -60,30 +40,16 @@ function CourseAssignment() {
 
   const assignCourse = async (userId: string, courseId: string) => {
     try {
-      const token = localStorage.getItem("accessToken");
-      if (!token) {
-        setError("No access token found");
-        return;
-      }
-
-      const response = await fetch(
+      await fetchWithAuth(
         "https://artwithvicky-backend.onrender.com/api/admin/assign-courses",
         {
           method: "POST",
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
           body: JSON.stringify({
             userId,
             courseIds: [courseId],
           }),
         }
       );
-
-      if (!response.ok) {
-        throw new Error(`Failed to assign course: ${response.status}`);
-      }
 
       setUsers((prevUsers) =>
         prevUsers.map((user) =>
@@ -105,30 +71,16 @@ function CourseAssignment() {
 
   const removeCourse = async (userId: string, courseId: string) => {
     try {
-      const token = localStorage.getItem("accessToken");
-      if (!token) {
-        setError("No access token found");
-        return;
-      }
-
-      const response = await fetch(
+      await fetchWithAuth(
         "https://artwithvicky-backend.onrender.com/api/admin/remove-courses",
         {
           method: "POST",
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
           body: JSON.stringify({
             userId,
             courseIds: [courseId],
           }),
         }
       );
-
-      if (!response.ok) {
-        throw new Error(`Failed to remove course: ${response.status}`);
-      }
 
       setUsers((prevUsers) =>
         prevUsers.map((user) =>
@@ -226,6 +178,6 @@ function CourseAssignment() {
       </table>
     </div>
   );
-}
+};
 
 export default CourseAssignment;
