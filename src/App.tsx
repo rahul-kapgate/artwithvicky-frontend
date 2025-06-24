@@ -2,7 +2,7 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Home from "./pages/Home";
 import Layout from "./layouts/Layout";
 import Courses from "./pages/Courses";
-import CoursePage from "./pages/CoursePage.tsx"; 
+import CoursePage from "./pages/CoursePage.tsx";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { AuthProvider } from "./context/AuthContext.tsx";
@@ -10,11 +10,11 @@ import AdminHome from "./pages/AdminPanel/AdminHome.tsx";
 
 function App() {
   return (
-    <AuthProvider>
-      <Router>
+    <Router>
+      <AuthProvider>
         <ToastContainer
           position="top-right"
-          autoClose={5000}
+          autoClose={1000}
           hideProgressBar={false}
           newestOnTop={false}
           closeOnClick
@@ -28,13 +28,12 @@ function App() {
           <Route path="/" element={<Layout />}>
             <Route index element={<Home />} />
             <Route path="/courses" element={<Courses />} />
-            <Route path="/course/:courseName" element={<CoursePage />} />{" "}
-            {/* New route */}
+            <Route path="/course/:courseName" element={<CoursePage />} />
             <Route path="/admin" element={<AdminHome />} />
           </Route>
         </Routes>
-      </Router>
-    </AuthProvider>
+      </AuthProvider>
+    </Router>
   );
 }
 
