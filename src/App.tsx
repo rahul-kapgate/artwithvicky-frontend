@@ -7,6 +7,7 @@ import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { AuthProvider } from "./context/AuthContext.tsx";
 import AdminHome from "./pages/AdminPanel/AdminHome.tsx";
+import "./App.css"; // Import custom CSS for toast styles
 
 function App() {
   return (
@@ -14,7 +15,7 @@ function App() {
       <AuthProvider>
         <ToastContainer
           position="top-right"
-          autoClose={1000}
+          autoClose={50000}
           hideProgressBar={false}
           newestOnTop={false}
           closeOnClick
@@ -23,6 +24,7 @@ function App() {
           draggable
           pauseOnHover
           theme="light"
+          className="modern-toast-container" // Add custom class for styling
         />
         <Routes>
           <Route path="/" element={<Layout />}>
