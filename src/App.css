@@ -1,5 +1,3 @@
-/* App.css */
-
 /* Import modern font (optional, ensure it's loaded in your project) */
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap');
 
@@ -103,7 +101,6 @@
   transition: transform 0.4s ease, opacity 0.4s ease;
 }
 
-/* Ensure toasts stack properly */
-.Toastify__toast-container--bottom-center .Toastify__toast {
-  margin-bottom: 8px;
+.custom-toast {
+  margin-bottom: 20px !important;
 }
