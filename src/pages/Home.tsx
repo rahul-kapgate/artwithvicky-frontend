@@ -144,13 +144,17 @@ const artworks = [
 
 export default function Home() {
   return (
-    <div className="min-h-screen bg-gradient-to-b from-pink-50 via-white to-white text-gray-800 scroll-smooth">
+    <div className="min-h-screen bg-gradient-to-b from-purple-50 via-white to-white text-gray-800 scroll-smooth">
       {/* Hero Section */}
       <section id="hero" className="text-center py-20 px-4">
         <div className="max-w-4xl mx-auto">
           <h1 className="text-5xl font-bold mb-4 tracking-tight">
-            Welcome to <span className="text-pink-600">Artistic Vicky</span>
+            Welcome to{" "}
+            <span className="bg-gradient-to-r from-purple-500 via-purple-600 to-purple-800 bg-clip-text text-transparent">
+              Artistic Vicky
+            </span>
           </h1>
+
           <p className="text-lg text-gray-600 mb-6">
             Discover colors, creativity, and inspiration through the eyes of
             Vicky.
@@ -215,7 +219,7 @@ export default function Home() {
           </p>
           <Link
             to="/courses"
-            className="inline-block bg-pink-600 hover:bg-pink-700 text-white text-lg font-medium px-6 py-3 rounded-full transition duration-300"
+            className="inline-block bg-purple-600 hover:bg-purple-700 text-white text-lg font-medium px-6 py-3 rounded-full transition duration-300"
           >
             View Courses
           </Link>
@@ -223,7 +227,7 @@ export default function Home() {
       </section>
 
       {/* About Section */}
-      <section id="about" className="py-20 bg-pink-50 px-4">
+      <section id="about" className="py-20 bg-purple-50 px-4">
         <div className="max-w-4xl mx-auto text-center">
           <h2 className="text-3xl font-semibold mb-4">About Us</h2>
           <p className="text-gray-700 text-lg mb-6">
@@ -236,7 +240,7 @@ export default function Home() {
           </p>
           <Badge
             variant="outline"
-            className="text-pink-600 border-pink-500 text-sm"
+            className="text-purple-600 border-purple-500 text-sm"
           >
             Based in India · Available for commissions
           </Badge>
@@ -246,7 +250,7 @@ export default function Home() {
       {/* Contact Section */}
       <section id="contact" className="py-20 bg-white px-4">
         <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-3xl font-semibold mb-4 text-pink-600">
+          <h2 className="text-3xl font-semibold mb-4 text-purple-600">
             Contact Us
           </h2>
           <p className="text-gray-600 mb-10">
@@ -258,7 +262,7 @@ export default function Home() {
               href="https://wa.me/919226221871"
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center justify-center space-x-2 text-gray-700 hover:text-pink-600 transition-colors duration-200"
+              className="flex items-center justify-center space-x-2 text-gray-700 hover:text-purple-600 transition-colors duration-200"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -274,7 +278,7 @@ export default function Home() {
             {/* Email */}
             <a
               href="mailto:vikkitembhurne358@gmail.com"
-              className="flex items-center justify-center space-x-2 text-gray-700 hover:text-pink-600 transition-colors duration-200"
+              className="flex items-center justify-center space-x-2 text-gray-700 hover:text-purple-600 transition-colors duration-200"
             >
               <Mail className="w-5 h-5" />
               <span>vikkitembhurne358@gmail.com</span>
@@ -285,7 +289,7 @@ export default function Home() {
               href="https://www.instagram.com/artistic.vicky/"
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center justify-center space-x-2 text-gray-700 hover:text-pink-600 transition-colors duration-200"
+              className="flex items-center justify-center space-x-2 text-gray-700 hover:text-purple-600 transition-colors duration-200"
             >
               <Instagram className="w-5 h-5" />
               <span>@artistic.vicky</span>
@@ -296,7 +300,7 @@ export default function Home() {
               href="https://www.youtube.com/@ArtisticVicky"
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center justify-center space-x-2 text-gray-700 hover:text-pink-600 transition-colors duration-200"
+              className="flex items-center justify-center space-x-2 text-gray-700 hover:text-purple-600 transition-colors duration-200"
             >
               <Youtube className="w-5 h-5" />
               <span>@ArtisticVicky</span>
@@ -307,7 +311,7 @@ export default function Home() {
               href="https://www.facebook.com/mayur.tembhurne.148"
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center justify-center space-x-2 text-gray-700 hover:text-pink-600 transition-colors duration-200"
+              className="flex items-center justify-center space-x-2 text-gray-700 hover:text-purple-600 transition-colors duration-200"
             >
               <Facebook className="w-5 h-5" />
               <span>Vicky Tembhurne</span>
