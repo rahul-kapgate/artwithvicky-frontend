@@ -35,7 +35,9 @@ export default function Header() {
     "bg-pink-600 text-white px-3 py-1.5 rounded-full hover:bg-pink-700 transition-colors shadow-sm text-sm";
 
   const adminButtonClass =
-    "bg-orange-600 text-white px-3 py-1.5 rounded-full hover:bg-orange-500 transition-colors shadow-sm text-sm flex items-center gap-1";
+
+    "bg-orange-600 text-white px-3 py-1.5 rounded-full hover:bg-red-700 transition-colors shadow-sm text-sm flex items-center gap-1";
+
 
   const openModal = (mode: "login" | "signup") => {
     setModalMode(mode);
