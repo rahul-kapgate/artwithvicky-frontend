@@ -21,7 +21,7 @@ export default function Header() {
       }
     }
   }, [location]);
-
+// hello
   const isActive = (path: string) => {
     return location.pathname + location.hash === path;
   };
