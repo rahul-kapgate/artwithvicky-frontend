@@ -242,11 +242,11 @@ export default function AuthModal({
       <div className="bg-white rounded-2xl shadow-xl max-w-md w-full mx-4 p-6 relative">
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 text-gray-600 hover:text-pink-600 transition-colors"
+          className="absolute top-4 right-4 text-gray-600 hover:text-purple-600 transition-colors"
         >
           <X className="w-6 h-6" />
         </button>
-        <h2 className="text-2xl font-bold text-pink-600 mb-6 text-center">
+        <h2 className="text-2xl font-bold text-purple-600 mb-6 text-center">
           {mode === "login"
             ? "Login to Artistic Vicky"
             : step === "form"
@@ -263,7 +263,7 @@ export default function AuthModal({
                   placeholder="Full Name"
                   value={formData.fullName}
                   onChange={handleChange}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                 />
                 {errors.fullName && (
                   <p className="text-red-500 text-sm mt-1">{errors.fullName}</p>
@@ -275,7 +275,7 @@ export default function AuthModal({
                   placeholder="Mobile Number"
                   value={formData.mobile}
                   onChange={handleChange}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                 />
                 {errors.mobile && (
                   <p className="text-red-500 text-sm mt-1">{errors.mobile}</p>
@@ -287,7 +287,7 @@ export default function AuthModal({
                   placeholder="Email"
                   value={formData.email}
                   onChange={handleChange}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                 />
                 {errors.email && (
                   <p className="text-red-500 text-sm mt-1">{errors.email}</p>
@@ -300,7 +300,7 @@ export default function AuthModal({
                   placeholder="Password"
                   value={formData.password}
                   onChange={handleChange}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                 />
                 {errors.password && (
                   <p className="text-red-500 text-sm mt-1">{errors.password}</p>
@@ -317,7 +317,7 @@ export default function AuthModal({
                   placeholder="Email or Mobile Number"
                   value={formData.emailOrMobile}
                   onChange={handleChange}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                 />
                 {errors.emailOrMobile && (
                   <p className="text-red-500 text-sm mt-1">
@@ -332,7 +332,7 @@ export default function AuthModal({
                   placeholder="Password"
                   value={formData.password}
                   onChange={handleChange}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                 />
                 {errors.password && (
                   <p className="text-red-500 text-sm mt-1">{errors.password}</p>
@@ -349,7 +349,7 @@ export default function AuthModal({
                 value={formData.otp}
                 onChange={handleChange}
                 maxLength={6}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent text-center text-lg tracking-widest"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-center text-lg tracking-widest"
               />
               {errors.otp && (
                 <p className="text-red-500 text-sm mt-1">{errors.otp}</p>
@@ -359,7 +359,7 @@ export default function AuthModal({
 
           <Button
             onClick={handleSubmit}
-            className="w-full bg-pink-600 hover:bg-pink-700 text-white py-2 px-4 rounded-lg transition-colors disabled:opacity-50"
+            className="w-full bg-purple-600 hover:bg-purple-700 text-white py-2 px-4 rounded-lg transition-colors disabled:opacity-50"
             disabled={loading}
           >
             {loading
@@ -398,7 +398,7 @@ export default function AuthModal({
                   otp: "",
                 });
               }}
-              className="text-pink-600 hover:underline ml-1 font-medium"
+              className="text-purple-600 hover:underline ml-1 font-medium"
             >
               {mode === "login" ? "Sign Up" : "Login"}
             </button>

@@ -28,11 +28,11 @@ export default function Header() {
 
   const linkClass = (path: string) =>
     isActive(path)
-      ? "text-pink-600 underline"
-      : "hover:text-pink-600 transition-colors";
+      ? "text-purple-600 underline"
+      : "hover:text-purple-600 transition-colors";
 
   const buttonClass =
-    "bg-pink-600 text-white px-3 py-1.5 rounded-full hover:bg-pink-700 transition-colors shadow-sm text-sm";
+    "bg-purple-600 text-white px-3 py-1.5 rounded-full hover:bg-purple-700 transition-colors shadow-sm text-sm";
 
   const adminButtonClass =
     "bg-orange-600 text-white px-3 py-1.5 rounded-full hover:bg-red-700 transition-colors shadow-sm text-sm flex items-center gap-1";
@@ -50,10 +50,10 @@ export default function Header() {
 
   return (
     <>
-      <header className="bg-white border-b border-pink-100 shadow-sm">
+      <header className="bg-white border-b border-purple-100 shadow-sm">
         <div className="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
           {/* Logo */}
-          <Link to="/" className="text-2xl font-bold text-pink-600">
+          <Link to="/" className="text-2xl font-bold bg-gradient-to-r from-purple-500 via-purple-600 to-purple-800 bg-clip-text text-transparent">
             Artistic Vicky
           </Link>
 
@@ -76,7 +76,7 @@ export default function Header() {
             </Link>
             {user ? (
               <>
-                <div className="w-8 h-8 rounded-full bg-pink-600 text-white flex items-center justify-center font-bold text-lg">
+                <div className="w-8 h-8 rounded-full bg-gradient-to-r from-purple-500 via-purple-600 to-purple-800 text-white flex items-center justify-center font-bold text-lg">
                   {user.fullName.charAt(0).toUpperCase()}
                 </div>
                 {/* Admin Panel Link - Only visible to admins */}
@@ -112,7 +112,7 @@ export default function Header() {
           <div className="flex items-center space-x-2 md:hidden">
             {user ? (
               <>
-                <div className="w-8 h-8 rounded-full bg-pink-600 text-white flex items-center justify-center font-bold text-lg">
+                <div className="w-8 h-8 rounded-full bg-purple-600 text-white flex items-center justify-center font-bold text-lg">
                   {user.fullName.charAt(0).toUpperCase()}
                 </div>
                 {/* Admin Panel Link for Mobile - Only visible to admins */}
@@ -144,7 +144,7 @@ export default function Header() {
             )}
             <button
               onClick={() => setMenuOpen(!menuOpen)}
-              className="text-pink-600"
+              className="text-purple-600"
             >
               {menuOpen ? (
                 <X className="w-6 h-6" />
@@ -157,7 +157,7 @@ export default function Header() {
 
         {/* Mobile Dropdown (Navigation Links Only) */}
         {menuOpen && (
-          <div className="md:hidden px-4 pb-4 bg-pink-50">
+          <div className="md:hidden px-4 pb-4 bg-purple-50">
             <nav className="flex flex-col space-y-3 text-sm font-medium text-gray-700">
               <Link
                 to="/"
