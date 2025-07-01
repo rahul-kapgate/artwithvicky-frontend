@@ -10,7 +10,7 @@ export default function Footer() {
             <li>
               <Link
                 to="/"
-                className="text-gray-600 hover:text-pink-600 transition-colors duration-200"
+                className="text-gray-600 hover:text-purple-600 transition-colors duration-200"
               >
                 Home
               </Link>
@@ -18,7 +18,7 @@ export default function Footer() {
             <li>
               <Link
                 to="/#gallery"
-                className="text-gray-600 hover:text-pink-600 transition-colors duration-200"
+                className="text-gray-600 hover:text-purple-600 transition-colors duration-200"
               >
                 Gallery
               </Link>
@@ -26,7 +26,7 @@ export default function Footer() {
             <li>
               <Link
                 to="/#about"
-                className="text-gray-600 hover:text-pink-600 transition-colors duration-200"
+                className="text-gray-600 hover:text-purple-600 transition-colors duration-200"
               >
                 About Us
               </Link>
@@ -34,7 +34,7 @@ export default function Footer() {
             <li>
               <Link
                 to="/#contact"
-                className="text-gray-600 hover:text-pink-600 transition-colors duration-200"
+                className="text-gray-600 hover:text-purple-600 transition-colors duration-200"
               >
                 Contact Us
               </Link>
