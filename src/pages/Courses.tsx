@@ -75,10 +75,10 @@ export default function Courses() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-white via-pink-50 to-white px-4 py-20 text-gray-800">
+    <div className="min-h-screen bg-gradient-to-b from-white via-purple-50 to-white px-4 py-20 text-gray-800">
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-12">
-          <h1 className="text-4xl sm:text-5xl font-bold text-pink-600">
+          <h1 className="text-4xl sm:text-5xl font-bold text-purple-600">
             MAH AAC CET Prep Course
           </h1>
           <p className="mt-4 text-lg text-gray-600">
@@ -94,7 +94,7 @@ export default function Courses() {
               className="rounded-2xl shadow-lg hover:shadow-xl transition duration-300 w-full max-w-3xl"
             >
               <CardContent className="p-8 space-y-6 text-left">
-                <h2 className="text-2xl sm:text-3xl font-semibold text-pink-700">
+                <h2 className="text-2xl sm:text-3xl font-semibold text-purple-700">
                   {course.title}
                 </h2>
                 <p className="text-gray-700 leading-relaxed">
@@ -102,7 +102,7 @@ export default function Courses() {
                 </p>
 
                 <div>
-                  <h3 className="text-pink-600 font-semibold mb-2">
+                  <h3 className="text-purple-600 font-semibold mb-2">
                     📚 Modules Covered
                   </h3>
                   <ul className="list-disc list-inside text-gray-700 space-y-1">
@@ -113,7 +113,7 @@ export default function Courses() {
                 </div>
 
                 <div>
-                  <h3 className="text-pink-600 font-semibold mb-2">
+                  <h3 className="text-purple-600 font-semibold mb-2">
                     🎁 Course Includes
                   </h3>
                   <ul className="list-disc list-inside text-gray-700 space-y-1">
@@ -139,7 +139,7 @@ export default function Courses() {
                       </Button>
                     </div>
                   ) : (
-                    <div className="bg-pink-50 border border-pink-200 rounded-xl p-4 mb-4 text-center">
+                    <div className="bg-purple-50 border border-purple-200 rounded-xl p-4 mb-4 text-center">
                       <div className="text-gray-500 text-sm line-through">
                         ₹{course.originalPrice}
                       </div>
@@ -149,7 +149,7 @@ export default function Courses() {
                           only
                         </span>
                       </div>
-                      <span className="inline-block mt-2 text-xs text-white bg-pink-500 px-3 py-1 rounded-full shadow-sm">
+                      <span className="inline-block mt-2 text-xs text-white bg-purple-500 px-3 py-1 rounded-full shadow-sm">
                         🎉 Limited Time Offer
                       </span>
                       <Button
