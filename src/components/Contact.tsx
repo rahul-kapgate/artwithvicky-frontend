@@ -3,7 +3,7 @@ import { Mail, Instagram, Youtube, Facebook } from "lucide-react";
 export default function Contact() {
   return (
     <div className="max-w-4xl mx-auto px-4 py-16">
-      <h1 className="text-3xl font-bold text-pink-600 mb-6 text-center">
+      <h1 className="text-3xl font-bold text-purple-600 mb-6 text-center">
         Contact Us
       </h1>
 
@@ -15,7 +15,7 @@ export default function Contact() {
         {/* Email */}
         <a
           href="mailto:vikkitembhurne358@gmail.com"
-          className="flex items-center justify-center space-x-2 text-gray-700 hover:text-pink-600 transition-colors duration-200"
+          className="flex items-center justify-center space-x-2 text-gray-700 hover:text-purple-600 transition-colors duration-200"
         >
           <Mail className="w-5 h-5" />
           <span>vikkitembhurne358@gmail.com</span>
@@ -26,7 +26,7 @@ export default function Contact() {
           href="https://www.instagram.com/artistic.vicky/"
           target="_blank"
           rel="noopener noreferrer"
-          className="flex items-center justify-center space-x-2 text-gray-700 hover:text-pink-600 transition-colors duration-200"
+          className="flex items-center justify-center space-x-2 text-gray-700 hover:text-purple-600 transition-colors duration-200"
         >
           <Instagram className="w-5 h-5" />
           <span>@artistic.vicky</span>
@@ -37,7 +37,7 @@ export default function Contact() {
           href="https://www.youtube.com/@ArtisticVicky"
           target="_blank"
           rel="noopener noreferrer"
-          className="flex items-center justify-center space-x-2 text-gray-700 hover:text-pink-600 transition-colors duration-200"
+          className="flex items-center justify-center space-x-2 text-gray-700 hover:text-purple-600 transition-colors duration-200"
         >
           <Youtube className="w-5 h-5" />
           <span>@ArtisticVicky</span>
@@ -48,7 +48,7 @@ export default function Contact() {
           href="https://www.facebook.com/mayur.tembhurne.148"
           target="_blank"
           rel="noopener noreferrer"
-          className="flex items-center justify-center space-x-2 text-gray-700 hover:text-pink-600 transition-colors duration-200"
+          className="flex items-center justify-center space-x-2 text-gray-700 hover:text-purple-600 transition-colors duration-200"
         >
           <Facebook className="w-5 h-5" />
           <span>Vicky Tembhurne</span>
