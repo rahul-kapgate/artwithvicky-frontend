@@ -173,7 +173,7 @@ function PDFUpload() {
         <Button
           type="submit"
           onClick={handleSubmit}
-          className="w-full bg-pink-600 hover:bg-pink-700 text-white"
+          className="w-full bg-purple-600 hover:bg-purple-700 text-white"
           disabled={uploading || loadingCourses}
         >
           {uploading ? "Uploading..." : "Upload PDF"}

@@ -102,7 +102,7 @@ const CourseAssignment: React.FC = () => {
   if (loading) {
     return (
       <div className="flex flex-col items-center justify-center py-10">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-pink-600 mb-4" />
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mb-4" />
         <p className="text-gray-600">Loading users...</p>
       </div>
     );
@@ -167,7 +167,7 @@ const CourseAssignment: React.FC = () => {
                   onClick={() =>
                     assignCourse(user._id, "6848338d4ef958e38643f3c3")
                   }
-                  className="bg-pink-600 hover:bg-pink-700 text-white text-xs"
+                  className="bg-purple-600 hover:bg-purple-700 text-white text-xs"
                 >
                   Assign Default Course
                 </Button>

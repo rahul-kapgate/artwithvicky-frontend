@@ -10,11 +10,11 @@ function AdminHome() {
   );
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-pink-50 via-white to-white text-gray-800">
+    <div className="min-h-screen bg-gradient-to-b from-purple-50 via-white to-white text-gray-800">
       {/* Header */}
       <header className="text-center py-10 border-b border-gray-200">
         <h1 className="text-4xl font-bold">
-          Admin <span className="text-pink-600">Dashboard</span>
+          Admin <span className="text-purple-600">Dashboard</span>
         </h1>
         <p className="text-gray-600 mt-2">Manage your platform operations</p>
       </header>
