@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { X } from "lucide-react";
+import { X, Eye, EyeOff } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { toast } from "react-toastify";
 
@@ -23,6 +23,7 @@ export default function AuthModal({
     email: "",
     emailOrMobile: "",
     password: "",
+    confirmPassword: "",
     otp: "",
   });
 
@@ -32,17 +33,35 @@ export default function AuthModal({
     email: "",
     emailOrMobile: "",
     password: "",
+    confirmPassword: "",
     otp: "",
   });
 
   const [step, setStep] = useState<"form" | "otp">("form");
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [passwordStrength, setPasswordStrength] = useState(0);
+
   const { login } = useAuth();
+
+  const calculatePasswordStrength = (password: string): number => {
+    let score = 0;
+    if (password.length >= 8) score++;
+    if (/[a-z]/.test(password)) score++;
+    if (/[A-Z]/.test(password)) score++;
+    if (/\d/.test(password)) score++;
+    if (/[\W_]/.test(password)) score++;
+    return score;
+  };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
     setErrors((prev) => ({ ...prev, [name]: "" }));
+
+    if (name === "password") {
+      setPasswordStrength(calculatePasswordStrength(value));
+    }
   };
 
   const validate = () => {
@@ -65,8 +84,23 @@ export default function AuthModal({
         newErrors.email = "Valid Email is required";
         valid = false;
       }
-      if (!formData.password || formData.password.length < 6) {
-        newErrors.password = "Password must be at least 6 characters";
+
+      const passwordRegex =
+        /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/;
+      if (!formData.password) {
+        newErrors.password = "Password is required";
+        valid = false;
+      } else if (!passwordRegex.test(formData.password)) {
+        newErrors.password =
+          "Password must be 8+ chars, include uppercase, number & special char";
+        valid = false;
+      }
+
+      if (
+        !formData.confirmPassword ||
+        formData.confirmPassword !== formData.password
+      ) {
+        newErrors.confirmPassword = "Passwords do not match";
         valid = false;
       }
     } else if (mode === "login") {
@@ -91,7 +125,6 @@ export default function AuthModal({
 
   const loginHandler = async (emailOrMobile: string, password: string) => {
     try {
-      // Determine if emailOrMobile is an email or mobile
       const isEmail = /\S+@\S+\.\S+/.test(emailOrMobile);
       const payload = isEmail
         ? { email: emailOrMobile, password }
@@ -116,7 +149,7 @@ export default function AuthModal({
             userId: data.userId,
             fullName: data.fullName,
             email: data.email,
-            role: data.role, // Include role in login context
+            role: data.role,
             authorizedCourses: data.authorizedCourses,
           },
           {
@@ -129,11 +162,9 @@ export default function AuthModal({
 
         if (data.role === "admin") {
           toast.success("Welcome Admin!");
-          // Do nothing — don't redirect
         } else {
-          onLoginSuccess?.(); // Call callback only for non-admins
+          onLoginSuccess?.();
         }
-
 
         onClose();
       } else {
@@ -181,7 +212,6 @@ export default function AuthModal({
             const data = await res.json();
             const errorMsg = data.message || "Signup initiation failed";
             toast.error(errorMsg);
-            console.error("Signup initiation failed:", errorMsg);
           }
         } else {
           const res = await fetch(
@@ -205,6 +235,7 @@ export default function AuthModal({
               email: "",
               emailOrMobile: "",
               password: "",
+              confirmPassword: "",
               otp: "",
             });
             setErrors({
@@ -213,8 +244,10 @@ export default function AuthModal({
               email: "",
               emailOrMobile: "",
               password: "",
+              confirmPassword: "",
               otp: "",
             });
+            setPasswordStrength(0);
           } else {
             const data = await res.json();
             const errorMsg = data.message || "OTP verification failed";
@@ -226,12 +259,7 @@ export default function AuthModal({
         await loginHandler(formData.emailOrMobile, formData.password);
       }
     } catch (err) {
-      console.error("Error submitting form:", err);
       toast.error("Network error, please try again later");
-      setErrors((prev) => ({
-        ...prev,
-        emailOrMobile: "Network error, please try again later",
-      }));
     } finally {
       setLoading(false);
     }
@@ -257,109 +285,149 @@ export default function AuthModal({
         <div className="space-y-4">
           {mode === "signup" && step === "form" && (
             <>
-              <div>
-                <input
-                  name="fullName"
-                  placeholder="Full Name"
-                  value={formData.fullName}
-                  onChange={handleChange}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                />
-                {errors.fullName && (
-                  <p className="text-red-500 text-sm mt-1">{errors.fullName}</p>
-                )}
-              </div>
-              <div>
-                <input
-                  name="mobile"
-                  placeholder="Mobile Number"
-                  value={formData.mobile}
-                  onChange={handleChange}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                />
-                {errors.mobile && (
-                  <p className="text-red-500 text-sm mt-1">{errors.mobile}</p>
-                )}
-              </div>
-              <div>
-                <input
-                  name="email"
-                  placeholder="Email"
-                  value={formData.email}
-                  onChange={handleChange}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                />
-                {errors.email && (
-                  <p className="text-red-500 text-sm mt-1">{errors.email}</p>
-                )}
-              </div>
-              <div>
+              <input
+                name="fullName"
+                placeholder="Full Name"
+                value={formData.fullName}
+                onChange={handleChange}
+                className="w-full px-4 py-2 border rounded-lg"
+              />
+              {errors.fullName && (
+                <p className="text-red-500 text-sm">{errors.fullName}</p>
+              )}
+
+              <input
+                name="mobile"
+                placeholder="Mobile Number"
+                value={formData.mobile}
+                onChange={handleChange}
+                className="w-full px-4 py-2 border rounded-lg"
+              />
+              {errors.mobile && (
+                <p className="text-red-500 text-sm">{errors.mobile}</p>
+              )}
+
+              <input
+                name="email"
+                placeholder="Email"
+                value={formData.email}
+                onChange={handleChange}
+                className="w-full px-4 py-2 border rounded-lg"
+              />
+              {errors.email && (
+                <p className="text-red-500 text-sm">{errors.email}</p>
+              )}
+
+              <div className="relative">
                 <input
                   name="password"
-                  type="password"
+                  type={showPassword ? "text" : "password"}
                   placeholder="Password"
                   value={formData.password}
                   onChange={handleChange}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                  className="w-full px-4 py-2 pr-12 border rounded-lg"
                 />
-                {errors.password && (
-                  <p className="text-red-500 text-sm mt-1">{errors.password}</p>
-                )}
+                <button
+                  type="button"
+                  onClick={() => setShowPassword((prev) => !prev)}
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-600"
+                >
+                  {showPassword ? <EyeOff /> : <Eye />}
+                </button>
               </div>
+              {errors.password && (
+                <p className="text-red-500 text-sm">{errors.password}</p>
+              )}
+              {formData.password && (
+                <>
+                  <div className="w-full h-1 rounded bg-gray-200">
+                    <div
+                      className={`h-full rounded transition-all duration-300 ${
+                        passwordStrength <= 2
+                          ? "bg-red-500 w-1/3"
+                          : passwordStrength <= 4
+                          ? "bg-yellow-500 w-2/3"
+                          : "bg-green-500 w-full"
+                      }`}
+                    ></div>
+                  </div>
+                  <p className="text-sm font-medium text-gray-600">
+                    {passwordStrength <= 2
+                      ? "Weak"
+                      : passwordStrength <= 4
+                      ? "Medium"
+                      : "Strong"}
+                  </p>
+                </>
+              )}
+
+              <input
+                name="confirmPassword"
+                type={showPassword ? "text" : "password"}
+                placeholder="Confirm Password"
+                value={formData.confirmPassword}
+                onChange={handleChange}
+                className="w-full px-4 py-2 border rounded-lg"
+              />
+              {errors.confirmPassword && (
+                <p className="text-red-500 text-sm">{errors.confirmPassword}</p>
+              )}
             </>
           )}
 
           {mode === "login" && step === "form" && (
             <>
-              <div>
-                <input
-                  name="emailOrMobile"
-                  placeholder="Email or Mobile Number"
-                  value={formData.emailOrMobile}
-                  onChange={handleChange}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                />
-                {errors.emailOrMobile && (
-                  <p className="text-red-500 text-sm mt-1">
-                    {errors.emailOrMobile}
-                  </p>
-                )}
-              </div>
-              <div>
+              <input
+                name="emailOrMobile"
+                placeholder="Email or Mobile Number"
+                value={formData.emailOrMobile}
+                onChange={handleChange}
+                className="w-full px-4 py-2 border rounded-lg"
+              />
+              {errors.emailOrMobile && (
+                <p className="text-red-500 text-sm">{errors.emailOrMobile}</p>
+              )}
+
+              <div className="relative">
                 <input
                   name="password"
-                  type="password"
+                  type={showPassword ? "text" : "password"}
                   placeholder="Password"
                   value={formData.password}
                   onChange={handleChange}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                  className="w-full px-4 py-2 pr-12 border rounded-lg"
                 />
-                {errors.password && (
-                  <p className="text-red-500 text-sm mt-1">{errors.password}</p>
-                )}
+                <button
+                  type="button"
+                  onClick={() => setShowPassword((prev) => !prev)}
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-600"
+                >
+                  {showPassword ? <EyeOff /> : <Eye />}
+                </button>
               </div>
+              {errors.password && (
+                <p className="text-red-500 text-sm">{errors.password}</p>
+              )}
             </>
           )}
 
           {step === "otp" && (
-            <div>
-              <input
-                name="otp"
-                placeholder="Enter 6-digit OTP"
-                value={formData.otp}
-                onChange={handleChange}
-                maxLength={6}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-center text-lg tracking-widest"
-              />
-              {errors.otp && (
-                <p className="text-red-500 text-sm mt-1">{errors.otp}</p>
-              )}
-            </div>
+            <input
+              name="otp"
+              placeholder="Enter 6-digit OTP"
+              value={formData.otp}
+              onChange={handleChange}
+              className="w-full px-4 py-2 border rounded-lg text-center tracking-widest"
+              maxLength={6}
+            />
+          )}
+          {errors.otp && (
+            <p className="text-red-500 text-sm">{errors.otp}</p>
           )}
 
           <Button
             onClick={handleSubmit}
-            className="w-full bg-purple-600 hover:bg-purple-700 text-white py-2 px-4 rounded-lg transition-colors disabled:opacity-50"
+            className="w-full bg-purple-600 hover:bg-purple-700 text-white py-2 rounded-lg"
             disabled={loading}
           >
             {loading
@@ -387,6 +455,7 @@ export default function AuthModal({
                   email: "",
                   emailOrMobile: "",
                   password: "",
+                  confirmPassword: "",
                   otp: "",
                 });
                 setErrors({
@@ -395,8 +464,10 @@ export default function AuthModal({
                   email: "",
                   emailOrMobile: "",
                   password: "",
+                  confirmPassword: "",
                   otp: "",
                 });
+                setPasswordStrength(0);
               }}
               className="text-purple-600 hover:underline ml-1 font-medium"
             >
