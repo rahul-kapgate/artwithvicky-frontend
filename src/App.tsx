@@ -8,11 +8,13 @@ import "react-toastify/dist/ReactToastify.css";
 import { AuthProvider } from "./context/AuthContext.tsx";
 import AdminHome from "./pages/AdminPanel/AdminHome.tsx";
 import "./App.css"; // Import custom CSS for toast styles
+import CursorTrail from "./components/Corsor.tsx" // Import custom CSS for cursor styles
 
 function App() {
   return (
     <Router>
       <AuthProvider>
+        <CursorTrail />
         <ToastContainer
           position="bottom-right"
           autoClose={3000}
@@ -28,6 +30,7 @@ function App() {
         />
         <Routes>
           <Route path="/" element={<Layout />}>
+          
             <Route index element={<Home />} />
             <Route path="/courses" element={<Courses />} />
             <Route path="/course/:courseName" element={<CoursePage />} />
