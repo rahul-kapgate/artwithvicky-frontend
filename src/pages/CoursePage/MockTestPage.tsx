@@ -119,7 +119,7 @@ const MockTestPage: React.FC = () => {
   };
 
   const handleSubmit = async () => {
-    setShowConfirm(false);
+    setShowConfirm(false); // Close submission modal
     let correctCount = 0;
     questions.forEach((q) => {
       if (answers[q._id] === q.correctOption) {
@@ -159,7 +159,15 @@ const MockTestPage: React.FC = () => {
   };
 
   const handleSubmitClick = () => {
-    setShowConfirm(true);
+    setShowConfirm(true); // Show submission confirmation modal
+  };
+
+  const handleLeaveClick = () => {
+    if (testStarted && !submitted) {
+      setShowLeaveConfirm(true); // Show leave confirmation modal
+    } else {
+      window.history.back();
+    }
   };
 
   const confirmLeave = () => {
@@ -227,6 +235,12 @@ const MockTestPage: React.FC = () => {
                 <p className="text-lg mb-6">
                   Your score: {score} out of {questions.length}
                 </p>
+                <Button
+                  className="bg-purple-600 hover:bg-purple-700 text-white px-6 py-2"
+                  onClick={handleLeaveClick}
+                >
+                  Back to Courses
+                </Button>
               </CardContent>
             </Card>
           </div>
@@ -343,6 +357,7 @@ const MockTestPage: React.FC = () => {
         </div>
       </section>
 
+      {/* Custom Submission Confirmation Modal */}
       {showConfirm && (
         <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50">
           <Card className="rounded-2xl shadow-md bg-purple-50 max-w-md w-full mx-4">
@@ -374,6 +389,7 @@ const MockTestPage: React.FC = () => {
         </div>
       )}
 
+      {/* Custom Leave Confirmation Modal */}
       {showLeaveConfirm && (
         <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50">
           <Card className="rounded-2xl shadow-md bg-purple-50 max-w-md w-full mx-4">
@@ -402,6 +418,7 @@ const MockTestPage: React.FC = () => {
         </div>
       )}
 
+      {/* Custom Tab Switch Warning Modal */}
       {showTabSwitchWarning && (
         <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50">
           <Card className="rounded-2xl shadow-md bg-purple-50 max-w-md w-full mx-4">
