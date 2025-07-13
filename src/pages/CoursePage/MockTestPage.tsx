@@ -285,12 +285,6 @@ const MockTestPage: React.FC = () => {
                 >
                   Submit Test
                 </Button>
-                <Button
-                  className="bg-gray-300 hover:bg-gray-400 text-gray-800 px-6 py-2"
-                  onClick={handleLeaveClick}
-                >
-                  Back to Courses
-                </Button>
               </div>
             </CardContent>
           </Card>
