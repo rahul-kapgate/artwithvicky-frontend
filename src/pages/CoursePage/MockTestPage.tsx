@@ -160,13 +160,13 @@ const MockTestPage: React.FC = () => {
     setShowConfirm(true); // Show submission confirmation modal
   };
 
-  const handleLeaveClick = () => {
-    if (testStarted && !submitted) {
-      setShowLeaveConfirm(true); // Show leave confirmation modal
-    } else {
-      window.history.back();
-    }
-  };
+//   const handleLeaveClick = () => {
+//     if (testStarted && !submitted) {
+//       setShowLeaveConfirm(true); // Show leave confirmation modal
+//     } else {
+//       window.history.back();
+//     }
+//   };
 
   const confirmLeave = () => {
     setShowLeaveConfirm(false);
