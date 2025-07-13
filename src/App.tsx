@@ -2,7 +2,7 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Home from "./pages/Home";
 import Layout from "./layouts/Layout";
 import Courses from "./pages/Courses";
-import CoursePage from "./pages/CoursePage.tsx";
+import ResourcePage from "./pages/CoursePage/ResourcePage.tsx";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { AuthProvider } from "./context/AuthContext.tsx";
@@ -30,7 +30,7 @@ function App() {
           <Route path="/" element={<Layout />}>
             <Route index element={<Home />} />
             <Route path="/courses" element={<Courses />} />
-            <Route path="/course/:courseName" element={<CoursePage />} />
+            <Route path="/course/:courseName" element={<ResourcePage />} />
             <Route path="/admin" element={<AdminHome />} />
           </Route>
         </Routes>
