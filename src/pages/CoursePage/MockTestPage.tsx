@@ -119,7 +119,7 @@ const MockTestPage: React.FC = () => {
   };
 
   const handleSubmit = async () => {
-    setShowConfirm(false); // Close submission modal
+    setShowConfirm(false);
     let correctCount = 0;
     questions.forEach((q) => {
       if (answers[q._id] === q.correctOption) {
