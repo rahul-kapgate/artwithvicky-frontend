@@ -3,11 +3,12 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import CourseAssignment from "./CourseAssignment.tsx";
 import UploadPDF from "./UploadPDF.tsx";
+import UploadImage from "./UploadImage.tsx";
 
 function AdminHome() {
-  const [activeTab, setActiveTab] = useState<"assignment" | "upload">(
-    "assignment"
-  );
+  const [activeTab, setActiveTab] = useState<
+    "assignment" | "upload" | "images"
+  >("assignment");
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-purple-50 via-white to-white text-gray-800">
@@ -34,11 +35,19 @@ function AdminHome() {
           >
             📄 Upload PDFs
           </Button>
+          <Button
+            variant={activeTab === "images" ? "default" : "outline"}
+            onClick={() => setActiveTab("images")}
+          >
+            🖼️ Upload Images
+          </Button>
         </div>
 
         {/* Content */}
         <Card className="p-6">
-          {activeTab === "assignment" ? <CourseAssignment /> : <UploadPDF />}
+          {activeTab === "assignment" && <CourseAssignment />}
+          {activeTab === "upload" && <UploadPDF />}
+          {activeTab === "images" && <UploadImage />} {/* ✅ New Tab */}
         </Card>
       </section>
     </div>
