@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { AlertCircle } from "lucide-react";
+import { AlertCircle, Download } from "lucide-react";
 
 interface Resource {
   _id: string;
@@ -9,7 +9,7 @@ interface Resource {
   uploadedAt: string;
 }
 
-function CoursePage() {
+function ResourcePage() {
   const [resources, setResources] = useState<Resource[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -43,7 +43,6 @@ function CoursePage() {
       }
 
       const data = await response.json();
-      // Validate response structure
       if (!data?.data?.resources) {
         throw new Error("Unexpected response format");
       }
@@ -74,7 +73,6 @@ function CoursePage() {
       window.URL.revokeObjectURL(blobUrl);
     } catch (err) {
       console.error("Download error:", err);
-      // Fallback to default browser behavior
       window.open(url, "_blank");
     }
   };
@@ -98,16 +96,47 @@ function CoursePage() {
     );
   }
 
-  return (
-    <div className="container mx-auto py-8">
-      <h1 className="text-2xl font-bold mb-6">Course Resources</h1>
-      {resources.length > 0 ? (
+  // Group resources by fileType
+  const groupedResources = {
+    notes: resources.filter((r) => r.fileType.toLowerCase() === "notes"),
+    pyq: resources.filter((r) => r.fileType.toLowerCase() === "pyq"),
+    ebook: resources.filter((r) => r.fileType.toLowerCase() === "ebook"),
+    session: resources.filter((r) => r.fileType.toLowerCase() === "session"),
+    others: resources.filter(
+      (r) =>
+        !["notes", "pyq", "ebook", "session"].includes(r.fileType.toLowerCase())
+    ),
+  };
+
+  const renderResourceSection = (title: string, resources: Resource[]) => {
+    if (resources.length === 0) return null;
+
+    return (
+      <div className="mb-8">
+        <h2 className="text-xl font-semibold mb-4 capitalize">{title}</h2>
         <ul className="space-y-4">
           {resources.map((resource) => (
             <li
               key={resource._id}
-              className="border border-gray-200 rounded-lg p-4 hover:bg-gray-50"
+              className="border border-gray-200 rounded-lg p-4 hover:bg-gray-50 flex justify-between items-center"
             >
+              <div>
+                <button
+                  onClick={() =>
+                    handleDownload(
+                      resource.cloudinaryUrl,
+                      `${resource.title}.pdf`
+                    )
+                  }
+                  className="text-blue-600 hover:underline font-medium"
+                >
+                  {resource.title}
+                </button>
+                <p className="text-sm text-gray-600">
+                  Type: {resource.fileType} | Uploaded:{" "}
+                  {new Date(resource.uploadedAt).toLocaleDateString()}
+                </p>
+              </div>
               <button
                 onClick={() =>
                   handleDownload(
@@ -115,17 +144,32 @@ function CoursePage() {
                     `${resource.title}.pdf`
                   )
                 }
-                className="text-blue-600 hover:underline font-medium"
+                className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
               >
-                {resource.title}
+                <Download className="h-5 w-5" />
+                Download
               </button>
-              <p className="text-sm text-gray-600">
-                Type: {resource.fileType} | Uploaded:{" "}
-                {new Date(resource.uploadedAt).toLocaleDateString()}
-              </p>
             </li>
           ))}
         </ul>
+      </div>
+    );
+  };
+
+  return (
+    <div className="container mx-auto py-8 p-10">
+      <h1 className="text-2xl font-bold mb-6">Course Resources</h1>
+      {resources.length > 0 ? (
+        <>
+          {renderResourceSection("Notes", groupedResources.notes)}
+          {renderResourceSection(
+            "Previous Year Questions",
+            groupedResources.pyq
+          )}
+          {renderResourceSection("E-Books", groupedResources.ebook)}
+          {renderResourceSection("Sessions", groupedResources.session)}
+          {renderResourceSection("Other Resources", groupedResources.others)}
+        </>
       ) : (
         <p className="text-gray-600 italic">No resources available</p>
       )}
@@ -133,4 +177,4 @@ function CoursePage() {
   );
 }
 
-export default CoursePage;
+export default ResourcePage;
