@@ -104,3 +104,14 @@
 .custom-toast {
   margin-bottom: 8px !important;
 }
+
+/* App.css */
+body {
+  cursor: none; /* Hides the default system cursor */
+}
+
+@media (hover: hover) and (pointer: fine) {
+  body {
+    cursor: none;
+  }
+}

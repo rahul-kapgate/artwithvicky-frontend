@@ -151,8 +151,9 @@ export default function Home() {
           <h1 className="text-5xl font-bold mb-4 tracking-tight">
             Welcome to{" "}
             <span className="bg-gradient-to-r from-purple-500 via-purple-600 to-purple-800 bg-clip-text text-transparent">
-              Artistic Vicky
-            </span>
+  Artistic Vicky
+</span>
+
           </h1>
 
           <p className="text-lg text-gray-600 mb-6">
