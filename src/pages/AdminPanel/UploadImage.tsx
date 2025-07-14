@@ -4,10 +4,11 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { toast } from "react-toastify";
 
-interface Course {
+interface Artwork {
   _id: string;
   title: string;
   description: string;
+  imageUrl: string;
 }
 
 function UploadImage() {
@@ -17,8 +18,27 @@ function UploadImage() {
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
 
-  const [courseId, setCourseId] = useState("");
-  const [loadingCourses, setLoadingCourses] = useState(true);
+  const [artworks, setArtworks] = useState<Artwork[]>([]);
+  const [editingId, setEditingId] = useState<string | null>(null);
+
+  const token = localStorage.getItem("accessToken");
+
+  // Fetch all images
+  useEffect(() => {
+    fetchImages();
+  }, []);
+
+  const fetchImages = async () => {
+    try {
+      const res = await fetch(
+        "https://artwithvicky-backend.onrender.com/api/images/get-images"
+      );
+      const data = await res.json();
+      setArtworks(data.data);
+    } catch (err) {
+      toast.error("Failed to fetch artworks");
+    }
+  };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0] || null;
@@ -36,58 +56,91 @@ function UploadImage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!title || !description || !imageFile) {
+    if (!title || !description || (!imageFile && !editingId)) {
       toast.error("All fields are required");
       return;
     }
 
     const formData = new FormData();
-    formData.append("file", imageFile);
+    if (imageFile) formData.append("file", imageFile);
     formData.append("title", title);
     formData.append("description", description);
 
+    const endpoint = editingId
+      ? `https://artwithvicky-backend.onrender.com/api/admin/images/${editingId}`
+      : `https://artwithvicky-backend.onrender.com/api/admin/image-upload`;
+
     try {
       setUploading(true);
-      const token = localStorage.getItem("accessToken");
 
-      const response = await fetch(
-        "https://artwithvicky-backend.onrender.com/api/admin/image-upload",
-        {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-          body: formData,
-        }
+      const res = await fetch(endpoint, {
+        method: editingId ? "PUT" : "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        body: formData,
+      });
+
+      const result = await res.json();
+
+      if (!res.ok) throw new Error(result.message || "Upload failed");
+
+      toast.success(
+        editingId ? "Image updated successfully" : "Image uploaded successfully"
       );
 
-      const result = await response.json();
-
-      if (!response.ok) {
-        throw new Error(result.message || "Image upload failed");
-      }
-
-      toast.success("Image uploaded successfully");
       setTitle("");
       setDescription("");
-      setCourseId("");
       setImageFile(null);
       setPreviewUrl(null);
+      setEditingId(null);
+      fetchImages();
 
-      // Reset input manually
       const input = document.getElementById("imageInput") as HTMLInputElement;
       if (input) input.value = "";
-    } catch (error: any) {
-      toast.error(error.message || "Upload failed");
+    } catch (err: any) {
+      toast.error(err.message || "Upload failed");
     } finally {
       setUploading(false);
     }
   };
 
+  const handleDelete = async (id: string) => {
+    if (!confirm("Are you sure you want to delete this image?")) return;
+
+    try {
+      const res = await fetch(
+        `https://artwithvicky-backend.onrender.com/api/admin/images/${id}`,
+        {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      const result = await res.json();
+
+      if (!res.ok) throw new Error(result.message || "Delete failed");
+
+      toast.success("Image deleted successfully");
+      fetchImages();
+    } catch (err: any) {
+      toast.error(err.message || "Delete failed");
+    }
+  };
+
+  const handleEdit = (art: Artwork) => {
+    setTitle(art.title);
+    setDescription(art.description);
+    setPreviewUrl(art.imageUrl);
+    setEditingId(art._id);
+  };
+
   return (
-    <div className="max-w-xl mx-auto py-10">
+    <div className="max-w-4xl mx-auto py-10">
       <h2 className="text-2xl font-semibold mb-6 text-center">
-        🖼️ Upload Artwork
+        {editingId ? "✏️ Edit Artwork" : "🖼️ Upload Artwork"}
       </h2>
       <div className="space-y-5">
         <div>
@@ -111,7 +164,7 @@ function UploadImage() {
         </div>
 
         <div>
-          <Label>Image File</Label>
+          <Label>Image File {editingId ? "(optional)" : ""}</Label>
           <Input
             id="imageInput"
             type="file"
@@ -136,8 +189,51 @@ function UploadImage() {
           className="w-full bg-purple-600 hover:bg-purple-700 text-white"
           disabled={uploading}
         >
-          {uploading ? "Uploading..." : "Upload Image"}
+          {uploading
+            ? "Uploading..."
+            : editingId
+            ? "Update Image"
+            : "Upload Image"}
         </Button>
+      </div>
+
+      {/* Display Uploaded Artworks */}
+      <div className="mt-10">
+        <h3 className="text-xl font-semibold mb-4">📂 Uploaded Images</h3>
+        <div className="grid md:grid-cols-3 sm:grid-cols-2 gap-6">
+          {artworks.map((art) => (
+            <div
+              key={art._id}
+              className="border rounded-lg overflow-hidden shadow"
+            >
+              <img
+                src={art.imageUrl}
+                alt={art.title}
+                className="w-full h-48 object-cover"
+              />
+              <div className="p-4">
+                <h4 className="font-semibold">{art.title}</h4>
+                <p className="text-sm text-gray-600">{art.description}</p>
+                <div className="mt-4 flex gap-2">
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => handleEdit(art)}
+                  >
+                    Edit
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="destructive"
+                    onClick={() => handleDelete(art._id)}
+                  >
+                    Delete
+                  </Button>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );
