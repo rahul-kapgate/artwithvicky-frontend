@@ -7,7 +7,9 @@ import { useAuth } from "@/context/AuthContext";
 export default function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
-  const [modalMode, setModalMode] = useState<"login" | "signup">("login");
+  const [modalMode, setModalMode] = useState<
+    "login" | "signup" | "forgotPassword"
+  >("login");
   const { user, logout, isAdmin } = useAuth(); // Added isAdmin
   const location = useLocation();
 

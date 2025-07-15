@@ -42,7 +42,7 @@ const createSlug = (title: string) => {
 export default function Courses() {
   const { user } = useAuth();
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
-  const [authMode, setAuthMode] = useState<"login" | "signup">("login");
+  const [authMode, setAuthMode] = useState<"login" | "signup" | "forgotPassword">("login");
   const navigate = useNavigate();
 
   const handleEnrollClick = (courseId: string, courseTitle: string) => {
@@ -65,7 +65,7 @@ export default function Courses() {
     setIsAuthModalOpen(false);
   };
 
-  const handleSwitchMode = (newMode: "login" | "signup") => {
+  const handleSwitchMode = (newMode: "login" | "signup" | "forgotPassword") => {
     setAuthMode(newMode);
   };
 
