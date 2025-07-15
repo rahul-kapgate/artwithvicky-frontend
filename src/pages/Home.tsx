@@ -1,146 +1,20 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import {  Mail, Instagram, Youtube, Facebook } from "lucide-react";
-import { Link } from "react-router-dom"; // ⬅️ Make sure this is at the top
+import { Mail, Instagram, Youtube, Facebook } from "lucide-react";
+import { Link } from "react-router-dom";
 import { Swiper, SwiperSlide } from "swiper/react";
 //@ts-ignore
 import "swiper/css";
 //@ts-ignore
 import "swiper/css/autoplay";
-import { Autoplay } from "swiper/modules";
+//@ts-ignore
+import "swiper/css/navigation"; // Import navigation CSS
+//@ts-ignore
+import "swiper/css/pagination"; // Import pagination CSS
 import axios from "axios";
 import { useEffect, useState } from "react";
-
-
-
-// const artworks = [
-//   {
-//     title: "Sunset Bloom",
-//     description: "",
-//     imageUrl: "/images/038b8e7fd25d78482c642ccb405e1047.jpg",
-//   },
-//   {
-//     title: "Leaf 2D Design – Split Complementary Colour Scheme",
-//     description: "",
-//     imageUrl: "/images/1878421155e7a3ff9d869a3d2bb756a1.jpg",
-//   },
-//   {
-//     title: "Cup, Bottle & Fruit – Object Drawing",
-//     description: "",
-//     imageUrl: "/images/20240417_164034.jpg",
-//   },
-//   {
-//     title: "Coconut – ObjectDrawing",
-//     description: "",
-//     imageUrl: "/images/20250409_132807.jpg",
-//   },
-//   {
-//     title: "Dreamy Dusk",
-//     description: "",
-//     imageUrl: "/images/20250603_144839.jpg",
-//   },
-//   {
-//     title: "Football Playing – Memory Drawing",
-//     description: "",
-//     imageUrl: "/images/26080428a75c521c530cf451fbea58f6.jpg",
-//   },
-//   {
-//     title: "Geometrical Shapes – 2D Design",
-//     description: "",
-//     imageUrl: "/images/2c05e915422d5626f0e272caaaaf3aee.jpg",
-//   },
-//   {
-//     title: "Bus Stand Scene – Memory Drawing",
-//     description: "",
-//     imageUrl: "/images/61837c25e589da6e929c249c111b81ec.jpg",
-//   },
-//   {
-//     title: "Art Tools – 2D Design",
-//     description: "",
-//     imageUrl: "/images/7281da70f2432214f51175d35a3db60f.jpg",
-//   },
-//   {
-//     title: "Leaf – Memory Drawing with Split Complementary Colour Scheme",
-//     description: "",
-//     imageUrl: "/images/IMG-20250506-WA0030.jpg",
-//   },
-//   {
-//     title: "Musical Instruments – 2D Design",
-//     description: "",
-//     imageUrl: "/images/IMG-20250506-WA0033.jpg",
-//   },
-//   {
-//     title: "Velvet Night",
-//     description: "",
-//     imageUrl: "/images/IMG_20241223_090922_733.jpg",
-//   },
-//   {
-//     title: "Market Scene – Memory Drawing",
-//     description: "",
-//     imageUrl: "/images/IMG_20241223_090925_096.jpg",
-//   },
-//   {
-//     title: "Pani Puri Eating Family – Memory Drawing",
-//     description: "",
-//     imageUrl: "/images/IMG_20241223_090927_647.jpg",
-//   },
-//   {
-//     title: "Market Scene – Memory Drawing",
-//     description: "",
-//     imageUrl: "/images/IMG_20241223_090929_603.jpg",
-//   },
-//   {
-//     title: "Fish Market Scene – Memory Drawing",
-//     description: "",
-//     imageUrl: "/images/IMG_20241223_090931_702.jpg",
-//   },
-//   {
-//     title: "Village Scene – Memory Drawing",
-//     description: "",
-//     imageUrl: "/images/IMG_20241223_090934_709.jpg",
-//   },
-//   {
-//     title: "Firefly Garden",
-//     description: "",
-//     imageUrl: "/images/IMG_20250403_080603_783.jpg",
-//   },
-//   {
-//     title: "Celestial Dreams",
-//     description: "",
-//     imageUrl: "/images/IMG_20250403_080642_504.jpg",
-//   },
-//   {
-//     title: "Serenity Shore",
-//     description: "",
-//     imageUrl: "/images/IMG_20250403_083158_726.jpg",
-//   },
-//   {
-//     title: "Art Materials – 2D Design",
-//     description: "",
-//     imageUrl: "/images/b4893c380785578e08c308239538ff7f.jpg",
-//   },
-//   {
-//     title: "Family Picnic – Memory Drawing",
-//     description: "",
-//     imageUrl: "/images/bfb83b4a9dfc73c8e6f935888a18cda6.jpg",
-//   },
-//   {
-//     title: "Pastel Pathways",
-//     description: "",
-//     imageUrl: "/images/e5e055325b4b74e1d79756143c15b3c1.jpg",
-//   },
-//   {
-//     title: "Flowers and Leaf – 2D Design",
-//     description: "",
-//     imageUrl: "/images/f81570e57f8e33072ab04ddd8aebc6c2.jpg",
-//   },
-//   {
-//     title: "Beach Scene – Memory Drawing",
-//     description: "",
-//     imageUrl: "/images/fbf2464895b0a9ec3059b8ca99b7e719.jpg",
-//   },
-// ];
+import { Autoplay } from "swiper/modules";
 
 
 interface Artwork {
@@ -150,32 +24,27 @@ interface Artwork {
   imageUrl: string;
 }
 
-
 export default function Home() {
+  const [artworks, setArtworks] = useState<Artwork[]>([]);
 
- const [artworks, setArtworks] = useState<Artwork[]>([]);
+  useEffect(() => {
+    fetchImages();
+  }, []);
 
- useEffect(() => {
-   fetchImages();
- }, []);
+  useEffect(() => {
+    console.log("Updated artworks state:", artworks);
+  }, [artworks]);
 
- useEffect(() => {
-   console.log("Updated artworks state:", artworks);
- }, [artworks]);
-
- const fetchImages = async () => {
-   try {
-     const response = await axios.get(
-       "https://artwithvicky-backend.onrender.com/api/images/get-images"
-     );
-     setArtworks(response.data.data);
-   } catch (error) {
-     console.error("Error fetching artworks:", error);
-   }
- };
-
-
-   
+  const fetchImages = async () => {
+    try {
+      const response = await axios.get(
+        "https://artwithvicky-backend.onrender.com/api/images/get-images"
+      );
+      setArtworks(response.data.data);
+    } catch (error) {
+      console.error("Error fetching artworks:", error);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-purple-50 via-white to-white text-gray-800 scroll-smooth">
@@ -188,7 +57,6 @@ export default function Home() {
               Artistic Vicky
             </span>
           </h1>
-
           <p className="text-lg text-gray-600 mb-6">
             Discover colors, creativity, and inspiration through the eyes of
             Vicky.
@@ -206,39 +74,59 @@ export default function Home() {
             Featured Artworks
           </h2>
           <Swiper
-            modules={[Autoplay]}
+            modules={[Autoplay]} // Add Navigation, Pagination, and Mousewheel
             autoplay={{
               delay: 2000,
               disableOnInteraction: false,
               pauseOnMouseEnter: true,
             }}
+            // navigation // Enable navigation arrows
+            // pagination={{ clickable: true }} // Enable clickable pagination dots
+            mousewheel={{ forceToAxis: true }} // Enable mousewheel scrolling
             spaceBetween={20}
             breakpoints={{
-              0: { slidesPerView: 1 }, // Mobile
-              640: { slidesPerView: 2 }, // Small tablets
-              1024: { slidesPerView: 3 }, // Laptops and larger
+              0: { slidesPerView: 1 },
+              640: { slidesPerView: 2 },
+              1024: { slidesPerView: 3 },
             }}
             loop={true}
+            touchRatio={1.5} // Adjust touch sensitivity
+            grabCursor={true} // Show grab cursor for better UX
+            onSwiper={(swiper) => console.log("Swiper initialized:", swiper)} // Debug Swiper initialization
+            onSlideChange={() => console.log("Slide changed")} // Debug slide change
           >
-            {artworks.map((art, idx) => (
-              <SwiperSlide key={idx}>
-                <Card className="rounded-2xl shadow-md hover:scale-105 transition-transform duration-300 h-full">
-                  <CardContent className="p-4">
-                    <div className="h-48 bg-gray-100 mb-4 rounded-xl overflow-hidden">
-                      <img
-                        src={art.imageUrl}
-                        alt={art.title}
-                        className="w-full h-full object-cover"
-                      />
-                    </div>
-                    <h3 className="text-xl font-medium">{art.title}</h3>
-                    <p className="text-sm text-gray-500 mt-1">
-                      {art.description}
-                    </p>
-                  </CardContent>
-                </Card>
+            {artworks.length > 0 ? (
+              artworks.map((art, idx) => (
+                <SwiperSlide key={idx}>
+                  <Card className="rounded-2xl shadow-md hover:scale-105 transition-transform duration-300 h-full">
+                    <CardContent className="p-4">
+                      <div className="h-48 bg-gray-100 mb-4 rounded-xl overflow-hidden">
+                        <img
+                          src={art.imageUrl}
+                          alt={art.title}
+                          className="w-full h-full object-cover"
+                          onError={() =>
+                            console.error(
+                              `Failed to load image: ${art.imageUrl}`
+                            )
+                          } // Debug image loading
+                        />
+                      </div>
+                      <h3 className="text-xl font-medium">{art.title}</h3>
+                      <p className="text-sm text-gray-500 mt-1">
+                        {art.description}
+                      </p>
+                    </CardContent>
+                  </Card>
+                </SwiperSlide>
+              ))
+            ) : (
+              <SwiperSlide>
+                <p className="text-center text-gray-500">
+                  No artworks available
+                </p>
               </SwiperSlide>
-            ))}
+            )}
           </Swiper>
         </div>
       </section>
