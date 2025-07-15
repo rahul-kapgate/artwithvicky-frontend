@@ -1,13 +1,13 @@
-import { useState } from "react";
+import { useState, useEffect } from "react"; // Added useEffect
 import { Button } from "@/components/ui/button";
 import { X, Eye, EyeOff } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { toast } from "react-toastify";
 
 interface AuthModalProps {
-  mode: "login" | "signup";
+  mode: "login" | "signup" | "forgotPassword"; // Added forgotPassword mode
   onClose: () => void;
-  onSwitchMode: (newMode: "login" | "signup") => void;
+  onSwitchMode: (newMode: "login" | "signup" | "forgotPassword") => void; // Updated
   onLoginSuccess?: () => void;
 }
 
@@ -25,6 +25,7 @@ export default function AuthModal({
     password: "",
     confirmPassword: "",
     otp: "",
+    newPassword: "", // Added for forgot password
   });
 
   const [errors, setErrors] = useState({
@@ -35,6 +36,7 @@ export default function AuthModal({
     password: "",
     confirmPassword: "",
     otp: "",
+    newPassword: "", // Added for forgot password
   });
 
   const [step, setStep] = useState<"form" | "otp">("form");
@@ -43,6 +45,19 @@ export default function AuthModal({
   const [passwordStrength, setPasswordStrength] = useState(0);
 
   const { login } = useAuth();
+
+  // Prefill email from local storage
+  useEffect(() => {
+    const storedUser = localStorage.getItem("user");
+    if (storedUser) {
+      const user = JSON.parse(storedUser);
+      setFormData((prev) => ({
+        ...prev,
+        email: user.email || "",
+        emailOrMobile: user.email || "",
+      }));
+    }
+  }, [mode]);
 
   const calculatePasswordStrength = (password: string): number => {
     let score = 0;
@@ -59,7 +74,7 @@ export default function AuthModal({
     setFormData((prev) => ({ ...prev, [name]: value }));
     setErrors((prev) => ({ ...prev, [name]: "" }));
 
-    if (name === "password") {
+    if (name === "password" || name === "newPassword") {
       setPasswordStrength(calculatePasswordStrength(value));
     }
   };
@@ -85,8 +100,7 @@ export default function AuthModal({
         valid = false;
       }
 
-      const passwordRegex =
-        /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/;
+      const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/;
       if (!formData.password) {
         newErrors.password = "Password is required";
         valid = false;
@@ -110,6 +124,25 @@ export default function AuthModal({
       }
       if (!formData.password || formData.password.length < 6) {
         newErrors.password = "Password must be at least 6 characters";
+        valid = false;
+      }
+    } else if (mode === "forgotPassword" && step === "form") {
+      if (!formData.email || !/\S+@\S+\.\S+/.test(formData.email)) {
+        newErrors.email = "Valid Email is required";
+        valid = false;
+      }
+    } else if (mode === "forgotPassword" && step === "otp") {
+      if (!formData.otp || formData.otp.length !== 6) {
+        newErrors.otp = "Enter a valid 6-digit OTP";
+        valid = false;
+      }
+      const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/;
+      if (!formData.newPassword) {
+        newErrors.newPassword = "New Password is required";
+        valid = false;
+      } else if (!passwordRegex.test(formData.newPassword)) {
+        newErrors.newPassword =
+          "Password must be 8+ chars, include uppercase, number & special char";
         valid = false;
       }
     }
@@ -185,6 +218,90 @@ export default function AuthModal({
     }
   };
 
+  const forgotPasswordInitiate = async () => {
+    try {
+      const res = await fetch(
+        "https://artwithvicky-backend.onrender.com/api/users/forgot-password/initiate",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email: formData.email }),
+        }
+      );
+      if (res.ok) {
+        setStep("otp");
+        toast.info("OTP sent to your email");
+      } else {
+        const data = await res.json();
+        const errorMsg = data.message || "Failed to initiate password reset";
+        toast.error(errorMsg);
+        setErrors((prev) => ({ ...prev, email: errorMsg }));
+      }
+    } catch (error) {
+      console.error("Network error:", error);
+      toast.error("Network error, please try again");
+      setErrors((prev) => ({
+        ...prev,
+        email: "Network error, please try again",
+      }));
+    }
+  };
+
+  const forgotPasswordVerify = async () => {
+    try {
+      const res = await fetch(
+        "https://artwithvicky-backend.onrender.com/api/users/forgot-password/verify",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            email: formData.email,
+            otp: formData.otp,
+            newPassword: formData.newPassword,
+          }),
+        }
+      );
+      if (res.ok) {
+        toast.success("Password reset successful! Please log in.");
+        onSwitchMode("login");
+        setStep("form");
+        setFormData({
+          fullName: "",
+          mobile: "",
+          email: "",
+          emailOrMobile: "",
+          password: "",
+          confirmPassword: "",
+          otp: "",
+          newPassword: "",
+        });
+        setErrors({
+          fullName: "",
+          mobile: "",
+          email: "",
+          emailOrMobile: "",
+          password: "",
+          confirmPassword: "",
+          otp: "",
+          newPassword: "",
+        });
+        setPasswordStrength(0);
+      } else {
+        const data = await res.json();
+        const errorMsg = data.message || "OTP verification failed";
+        toast.error(errorMsg);
+        setErrors((prev) => ({ ...prev, otp: errorMsg }));
+      }
+    } catch (error) {
+      console.error("Network error:", error);
+      toast.error("Network error, please try again");
+      setErrors((prev) => ({
+        ...prev,
+        otp: "Network error, please try again",
+      }));
+    }
+  };
+
   const handleSubmit = async () => {
     if (!validate()) return;
     setLoading(true);
@@ -237,6 +354,7 @@ export default function AuthModal({
               password: "",
               confirmPassword: "",
               otp: "",
+              newPassword: "",
             });
             setErrors({
               fullName: "",
@@ -246,6 +364,7 @@ export default function AuthModal({
               password: "",
               confirmPassword: "",
               otp: "",
+              newPassword: "",
             });
             setPasswordStrength(0);
           } else {
@@ -255,8 +374,14 @@ export default function AuthModal({
             setErrors((prev) => ({ ...prev, otp: errorMsg }));
           }
         }
-      } else {
+      } else if (mode === "login") {
         await loginHandler(formData.emailOrMobile, formData.password);
+      } else if (mode === "forgotPassword") {
+        if (step === "form") {
+          await forgotPasswordInitiate();
+        } else {
+          await forgotPasswordVerify();
+        }
       }
     } catch (err) {
       toast.error("Network error, please try again later");
@@ -277,8 +402,10 @@ export default function AuthModal({
         <h2 className="text-2xl font-bold text-purple-600 mb-6 text-center">
           {mode === "login"
             ? "Login to Artistic Vicky"
-            : step === "form"
+            : mode === "signup" && step === "form"
             ? "Sign Up for Artistic Vicky"
+            : mode === "forgotPassword" && step === "form"
+            ? "Reset Password"
             : "Verify OTP"}
         </h2>
 
@@ -408,21 +535,113 @@ export default function AuthModal({
               {errors.password && (
                 <p className="text-red-500 text-sm">{errors.password}</p>
               )}
+              <p className="text-right">
+                <button
+                  onClick={() => {
+                    setStep("form");
+                    onSwitchMode("forgotPassword");
+                    setFormData((prev) => ({
+                      ...prev,
+                      emailOrMobile: "",
+                      password: "",
+                      otp: "",
+                      newPassword: "",
+                    }));
+                    setErrors({
+                      fullName: "",
+                      mobile: "",
+                      email: "",
+                      emailOrMobile: "",
+                      password: "",
+                      confirmPassword: "",
+                      otp: "",
+                      newPassword: "",
+                    });
+                    setPasswordStrength(0);
+                  }}
+                  className="text-purple-600 hover:underline text-sm font-medium"
+                >
+                  Forgot Password?
+                </button>
+              </p>
+            </>
+          )}
+
+          {mode === "forgotPassword" && step === "form" && (
+            <>
+              <input
+                name="email"
+                placeholder="Email"
+                value={formData.email}
+                onChange={handleChange}
+                className="w-full px-4 py-2 border rounded-lg"
+              />
+              {errors.email && (
+                <p className="text-red-500 text-sm">{errors.email}</p>
+              )}
             </>
           )}
 
           {step === "otp" && (
-            <input
-              name="otp"
-              placeholder="Enter 6-digit OTP"
-              value={formData.otp}
-              onChange={handleChange}
-              className="w-full px-4 py-2 border rounded-lg text-center tracking-widest"
-              maxLength={6}
-            />
-          )}
-          {errors.otp && (
-            <p className="text-red-500 text-sm">{errors.otp}</p>
+            <>
+              <input
+                name="otp"
+                placeholder="Enter 6-digit OTP"
+                value={formData.otp}
+                onChange={handleChange}
+                className="w-full px-4 py-2 border rounded-lg text-center tracking-widest"
+                maxLength={6}
+              />
+              {errors.otp && (
+                <p className="text-red-500 text-sm">{errors.otp}</p>
+              )}
+              {mode === "forgotPassword" && (
+                <>
+                  <div className="relative">
+                    <input
+                      name="newPassword"
+                      type={showPassword ? "text" : "password"}
+                      placeholder="New Password"
+                      value={formData.newPassword}
+                      onChange={handleChange}
+                      className="w-full px-4 py-2 pr-12 border rounded-lg"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword((prev) => !prev)}
+                      className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-600"
+                    >
+                      {showPassword ? <EyeOff /> : <Eye />}
+                    </button>
+                  </div>
+                  {errors.newPassword && (
+                    <p className="text-red-500 text-sm">{errors.newPassword}</p>
+                  )}
+                  {formData.newPassword && (
+                    <>
+                      <div className="w-full h-1 rounded bg-gray-200">
+                        <div
+                          className={`h-full rounded transition-all duration-300 ${
+                            passwordStrength <= 2
+                              ? "bg-red-500 w-1/3"
+                              : passwordStrength <= 4
+                              ? "bg-yellow-500 w-2/3"
+                              : "bg-green-500 w-full"
+                          }`}
+                        ></div>
+                      </div>
+                      <p className="text-sm font-medium text-gray-600">
+                        {passwordStrength <= 2
+                          ? "Weak"
+                          : passwordStrength <= 4
+                          ? "Medium"
+                          : "Strong"}
+                      </p>
+                    </>
+                  )}
+                </>
+              )}
+            </>
           )}
 
           <Button
@@ -433,10 +652,14 @@ export default function AuthModal({
             {loading
               ? "Please wait..."
               : step === "otp"
-              ? "Verify OTP"
+              ? mode === "forgotPassword"
+                ? "Reset Password"
+                : "Verify OTP"
               : mode === "login"
               ? "Login"
-              : "Sign Up"}
+              : mode === "signup"
+              ? "Sign Up"
+              : "Send OTP"}
           </Button>
         </div>
 
@@ -444,11 +667,19 @@ export default function AuthModal({
           <p className="mt-4 text-center text-gray-600">
             {mode === "login"
               ? "Don't have an account?"
-              : "Already have an account?"}
+              : mode === "signup"
+              ? "Already have an account?"
+              : "Back to login"}
             <button
               onClick={() => {
                 setStep("form");
-                onSwitchMode(mode === "login" ? "signup" : "login");
+                onSwitchMode(
+                  mode === "login"
+                    ? "signup"
+                    : mode === "signup"
+                    ? "login"
+                    : "login"
+                );
                 setFormData({
                   fullName: "",
                   mobile: "",
@@ -457,6 +688,7 @@ export default function AuthModal({
                   password: "",
                   confirmPassword: "",
                   otp: "",
+                  newPassword: "",
                 });
                 setErrors({
                   fullName: "",
@@ -466,12 +698,17 @@ export default function AuthModal({
                   password: "",
                   confirmPassword: "",
                   otp: "",
+                  newPassword: "",
                 });
                 setPasswordStrength(0);
               }}
               className="text-purple-600 hover:underline ml-1 font-medium"
             >
-              {mode === "login" ? "Sign Up" : "Login"}
+              {mode === "login"
+                ? "Sign Up"
+                : mode === "signup"
+                ? "Login"
+                : "Login"}
             </button>
           </p>
         )}
