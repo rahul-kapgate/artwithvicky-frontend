@@ -15,7 +15,6 @@ import ResourcePage from "./pages/CoursePage/ResourcePage.tsx";
 import MockTestPage from "./pages/CoursePage/MockTestPage.tsx";
 import VideoLecturesPage from "./pages/CoursePage/VideoLecturesPage.tsx";
 
-
 function App() {
   return (
     <Router>
@@ -38,6 +37,7 @@ function App() {
           <Route path="/" element={<Layout />}>
           
             <Route index element={<Home />} />
+            
             <Route path="/courses" element={<Courses />} />
             <Route path="/course/:courseName" element={<MainCoursePage />} />
             <Route
@@ -53,6 +53,7 @@ function App() {
               element={<VideoLecturesPage />}
             />
             <Route path="/admin" element={<AdminHome />} />
+            {/* <Route path="/links" element={<LinksPage />} /> */}
           </Route>
         </Routes>
       </AuthProvider>

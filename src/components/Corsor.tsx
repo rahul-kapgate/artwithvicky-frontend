@@ -1,10 +1,19 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import gsap from "gsap";
 
 export default function CursorTrail() {
   const dotRef = useRef<HTMLDivElement>(null);
+  const [showDot, setShowDot] = useState(false);
 
   useEffect(() => {
+    // Only enable cursor trail on non-mobile devices
+    const isDesktop = window.innerWidth >= 768;
+    setShowDot(isDesktop);
+  }, []);
+
+  useEffect(() => {
+    if (!showDot) return;
+
     const dot = dotRef.current;
     if (!dot) return;
 
@@ -34,7 +43,9 @@ export default function CursorTrail() {
     return () => {
       window.removeEventListener("mousemove", handleMouseMove);
     };
-  }, []);
+  }, [showDot]);
+
+  if (!showDot) return null;
 
   return (
     <div

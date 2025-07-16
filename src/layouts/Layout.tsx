@@ -2,6 +2,7 @@ import { Outlet, useLocation } from "react-router-dom";
 import { useEffect } from "react";
 import Footer from "@/components/Footer";
 import Header from "@/components/Header";
+import LinksPage from "@/pages/CoursePage/LinkPage";
 
 export default function Layout() {
   const location = useLocation();
@@ -24,6 +25,7 @@ export default function Layout() {
       <main className="flex-grow">
         <Outlet />
       </main>
+      <LinksPage />
       <Footer />
     </div>
   );

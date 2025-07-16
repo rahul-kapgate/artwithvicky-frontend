@@ -23,7 +23,7 @@ export default function Header() {
       }
     }
   }, [location]);
-// hello
+
   const isActive = (path: string) => {
     return location.pathname + location.hash === path;
   };
@@ -37,9 +37,7 @@ export default function Header() {
     "bg-purple-600 text-white px-3 py-1.5 rounded-full hover:bg-purple-700 transition-colors shadow-sm text-sm";
 
   const adminButtonClass =
-
     "bg-orange-600 text-white px-3 py-1.5 rounded-full hover:bg-red-700 transition-colors shadow-sm text-sm flex items-center gap-1";
-
 
   const openModal = (mode: "login" | "signup") => {
     setModalMode(mode);
@@ -57,7 +55,10 @@ export default function Header() {
       <header className="bg-white border-b border-purple-100 shadow-sm">
         <div className="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
           {/* Logo */}
-          <Link to="/" className="text-2xl font-bold bg-gradient-to-r from-purple-500 via-purple-600 to-purple-800 bg-clip-text text-transparent">
+          <Link
+            to="/"
+            className="text-2xl font-bold bg-gradient-to-r from-purple-500 via-purple-600 to-purple-800 bg-clip-text text-transparent"
+          >
             Artistic Vicky
           </Link>
 
@@ -77,6 +78,9 @@ export default function Header() {
             </Link>
             <Link to="/courses" className={linkClass("/courses")}>
               Courses
+            </Link>
+            <Link to="/links" className={linkClass("/links")}>
+              Links
             </Link>
             {user ? (
               <>
@@ -150,11 +154,7 @@ export default function Header() {
               onClick={() => setMenuOpen(!menuOpen)}
               className="text-purple-600"
             >
-              {menuOpen ? (
-                <X className="w-6 h-6" />
-              ) : (
-                <Menu className="w-6 h-6" />
-              )}
+              {menuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
             </button>
           </div>
         </div>
@@ -197,6 +197,13 @@ export default function Header() {
                 className={linkClass("/courses")}
               >
                 Courses
+              </Link>
+              <Link
+                to="/links"
+                onClick={() => setMenuOpen(false)}
+                className={linkClass("/links")}
+              >
+                Links
               </Link>
               {/* Admin Panel Link in Mobile Menu - Only visible to admins */}
               {user && isAdmin() && (
