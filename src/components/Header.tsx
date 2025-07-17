@@ -79,7 +79,7 @@ export default function Header() {
             <Link to="/courses" className={linkClass("/courses")}>
               Courses
             </Link>
-            <Link to="/links" className={linkClass("/links")}>
+            <Link to="/#links" className={linkClass("/#links")}>
               Links
             </Link>
             {user ? (
