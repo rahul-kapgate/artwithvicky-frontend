@@ -1,21 +1,15 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Mail, Instagram, Youtube, Facebook } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Swiper, SwiperSlide } from "swiper/react";
-//@ts-ignore
+// @ts-ignore
 import "swiper/css";
-//@ts-ignore
+// @ts-ignore
 import "swiper/css/autoplay";
-//@ts-ignore
-import "swiper/css/navigation"; // Import navigation CSS
-//@ts-ignore
-import "swiper/css/pagination"; // Import pagination CSS
 import axios from "axios";
 import { useEffect, useState } from "react";
 import { Autoplay } from "swiper/modules";
-
 
 interface Artwork {
   _id: string;
@@ -24,6 +18,36 @@ interface Artwork {
   imageUrl: string;
 }
 
+const contactLinks = [
+  { label: "Website", url: "https://artisticvicky.netlify.app/", icon: "🌐" },
+  { label: "WhatsApp", url: "https://wa.me/9226221871", display: "9226221871", icon: "📱" },
+  { label: "E-mail", url: "mailto:vikkitembhurne358@gmail.com", display: "vikkitembhurne358@gmail.com", icon: "✉️" },
+  { label: "WhatsApp Group", url: "https://chat.whatsapp.com/LYEPtRmEj9L...", icon: "👥" },
+  { label: "Instagram", url: "https://www.instagram.com/artistic.vicky/", icon: "📸" },
+];
+
+const productLinks = [
+  { label: "Stadler Graphite Pencils", url: "https://amzn.to/45uKJ2E" },
+  { label: "Kneaded Eraser", url: "https://amzn.to/4eeJGWY" },
+  { label: "Camel Artist Watercolor Tube Set", url: "https://amzn.to/404SyJ1" },
+  { label: "Colour Mixing Pallet", url: "https://amzn.to/4ndwKVb" },
+  { label: "Camel Brush Set", url: "https://amzn.to/4lbBCbG" },
+  { label: "Poster Colours", url: "https://amzn.to/44nZH9D" },
+  { label: "Mono Zero Eraser", url: "https://amzn.to/4l2cSTB" },
+  { label: "White Gelly Roll Pen", url: "https://amzn.to/40ddSvI" },
+  { label: "Electric Eraser", url: "https://amzn.to/3GakBQc" },
+  { label: "Brustro Artist Drawing Paper", url: "https://amzn.to/3G6SxgK" },
+  { label: "Brustro Drawing Paper 200gsm", url: "https://amzn.to/4kQjsMK" },
+  { label: "Camelin Charcoal Pencils", url: "https://amzn.to/3ZGH2Dp" },
+  { label: "Sand Paper", url: "https://amzn.to/45vKAMt" },
+  { label: "Charcoal Powder", url: "https://amzn.to/3HTGd3Z" },
+  { label: "Pencil Extender", url: "https://amzn.to/44aOt8x" },
+  { label: "Fixative Spray", url: "https://amzn.to/4lzl0uO" },
+  { label: "Think 3d Book", url: "https://amzn.to/3Tdqv6f" },
+  { label: "A3 Drawing Book", url: "https://amzn.to/3I4YPhC" },
+  { label: "Pen Tab & Laptop", url: "https://amzn.to/3TzrDkF" },
+];
+
 export default function Home() {
   const [artworks, setArtworks] = useState<Artwork[]>([]);
 
@@ -31,15 +55,9 @@ export default function Home() {
     fetchImages();
   }, []);
 
-  useEffect(() => {
-    console.log("Updated artworks state:", artworks);
-  }, [artworks]);
-
   const fetchImages = async () => {
     try {
-      const response = await axios.get(
-        "https://artwithvicky-backend.onrender.com/api/images/get-images"
-      );
+      const response = await axios.get("https://artwithvicky-backend.onrender.com/api/images/get-images");
       setArtworks(response.data.data);
     } catch (error) {
       console.error("Error fetching artworks:", error);
@@ -48,18 +66,18 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-purple-50 via-white to-white text-gray-800 scroll-smooth">
-      {/* Hero Section */}
-      <section id="hero" className="text-center py-20 px-4">
+
+      {/* Hero */}
+      <section className="text-center py-20 px-4">
         <div className="max-w-4xl mx-auto">
-          <h1 className="text-5xl font-bold mb-4 tracking-tight">
+          <h1 className="text-5xl font-bold mb-4">
             Welcome to{" "}
             <span className="bg-gradient-to-r from-purple-500 via-purple-600 to-purple-800 bg-clip-text text-transparent">
               Artistic Vicky
             </span>
           </h1>
           <p className="text-lg text-gray-600 mb-6">
-            Discover colors, creativity, and inspiration through the eyes of
-            Vicky.
+            Discover colors, creativity, and inspiration through the eyes of Vicky.
           </p>
           <a href="#gallery">
             <Button className="text-lg px-6 py-4">Explore Gallery</Button>
@@ -67,22 +85,14 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Featured Artworks */}
+      {/* Gallery */}
       <section id="gallery" className="py-16 bg-white px-4">
         <div className="max-w-6xl mx-auto">
-          <h2 className="text-3xl font-semibold text-center mb-10">
-            Featured Artworks
-          </h2>
+          <h2 className="text-3xl font-semibold text-center mb-10">Featured Artworks</h2>
           <Swiper
-            modules={[Autoplay]} // Add Navigation, Pagination, and Mousewheel
-            autoplay={{
-              delay: 2000,
-              disableOnInteraction: false,
-              pauseOnMouseEnter: true,
-            }}
-            // navigation // Enable navigation arrows
-            // pagination={{ clickable: true }} // Enable clickable pagination dots
-            mousewheel={{ forceToAxis: true }} // Enable mousewheel scrolling
+            modules={[Autoplay]}
+            autoplay={{ delay: 2000, disableOnInteraction: false, pauseOnMouseEnter: true }}
+            mousewheel={{ forceToAxis: true }}
             spaceBetween={20}
             breakpoints={{
               0: { slidesPerView: 1 },
@@ -90,10 +100,8 @@ export default function Home() {
               1024: { slidesPerView: 3 },
             }}
             loop={true}
-            touchRatio={1.5} // Adjust touch sensitivity
-            grabCursor={true} // Show grab cursor for better UX
-            onSwiper={(swiper) => console.log("Swiper initialized:", swiper)} // Debug Swiper initialization
-            onSlideChange={() => console.log("Slide changed")} // Debug slide change
+            touchRatio={1.5}
+            grabCursor={true}
           >
             {artworks.length > 0 ? (
               artworks.map((art, idx) => (
@@ -105,39 +113,30 @@ export default function Home() {
                           src={art.imageUrl}
                           alt={art.title}
                           className="w-full h-full object-cover"
-                          onError={() =>
-                            console.error(
-                              `Failed to load image: ${art.imageUrl}`
-                            )
-                          } // Debug image loading
+                          onError={() => console.error(`Image load failed: ${art.imageUrl}`)}
                         />
                       </div>
                       <h3 className="text-xl font-medium">{art.title}</h3>
-                      <p className="text-sm text-gray-500 mt-1">
-                        {art.description}
-                      </p>
+                      <p className="text-sm text-gray-500 mt-1">{art.description}</p>
                     </CardContent>
                   </Card>
                 </SwiperSlide>
               ))
             ) : (
               <SwiperSlide>
-                <p className="text-center text-gray-500">
-                  No artworks available
-                </p>
+                <p className="text-center text-gray-500">No artworks available</p>
               </SwiperSlide>
             )}
           </Swiper>
         </div>
       </section>
 
-      {/* Courses Section */}
+      {/* Courses */}
       <section id="courses" className="py-20 bg-white px-4">
         <div className="max-w-4xl mx-auto text-center">
           <h2 className="text-3xl font-semibold mb-4">Our Courses</h2>
           <p className="text-gray-700 text-lg mb-6">
-            Unlock your creativity and build your skills with our exclusive art
-            courses.
+            Unlock your creativity and build your skills with our exclusive art courses.
           </p>
           <Link
             to="/courses"
@@ -148,96 +147,96 @@ export default function Home() {
         </div>
       </section>
 
-      {/* About Section */}
-      <section id="about" className="py-20 bg-purple-50 px-4">
-        <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-3xl font-semibold mb-4">About Us</h2>
-          <p className="text-gray-700 text-lg mb-6">
-            Art Inspiration & BFA Exam Success – Discover a world of artistic
-            inspiration through captivating videos on drawing, painting, digital
-            art, and more. Simultaneously, navigate your Bachelor of Fine Arts
-            journey with our comprehensive exam guides, study strategies, and
-            important updates. Join us now to fuel your creativity and conquer
-            your BFA exams! 🏆
+      {/* Fancy About Us */}
+      <section
+        id="about"
+        className="py-20 px-6 bg-gradient-to-r from-purple-100 via-purple-50 to-purple-100 relative overflow-hidden"
+      >
+        {/* Decorative animated circles */}
+        <div className="absolute -top-16 -left-16 w-48 h-48 bg-purple-300 rounded-full opacity-20 animate-pulse"></div>
+        <div className="absolute -bottom-16 -right-16 w-48 h-48 bg-purple-400 rounded-full opacity-30 animate-pulse animation-delay-2000"></div>
+
+        <div className="max-w-4xl mx-auto bg-white rounded-3xl shadow-xl p-12 relative z-10">
+          <h2 className="text-4xl font-extrabold mb-6 flex items-center justify-center gap-3 text-purple-700">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-10 w-10 text-purple-600"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              strokeWidth={2}
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M12 8c-1.657 0-3 1.567-3 3.5S10.343 15 12 15s3-1.567 3-3.5S13.657 8 12 8z"
+              />
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M12 15v4m0 0H9m3 0h3"
+              />
+            </svg>
+            About Us
+          </h2>
+
+          <p className="text-gray-700 text-lg mb-6 leading-relaxed tracking-wide">
+            Art Inspiration & BFA Exam Success – Discover a world of artistic inspiration through captivating videos on drawing, painting, digital art, and more.
+            Simultaneously, navigate your Bachelor of Fine Arts journey with our comprehensive exam guides, study strategies, and important updates.
+            Join us now to fuel your creativity and conquer your BFA exams! <span className="inline-block text-purple-600 text-2xl">🏆</span>
           </p>
+
           <Badge
             variant="outline"
-            className="text-purple-600 border-purple-500 text-sm"
+            className="text-purple-600 border-purple-500 text-sm font-semibold px-4 py-2"
           >
             Based in India · Available for commissions
           </Badge>
         </div>
       </section>
 
-      {/* Contact Section */}
-      <section id="contact" className="py-20 bg-white px-4">
-        <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-3xl font-semibold mb-4 text-purple-600">
-            Contact Us
-          </h2>
-          <p className="text-gray-600 mb-10">
-            Feel free to reach out through any of the following platforms:
-          </p>
-          <div className="space-y-6">
-            {/* WhatsApp */}
-            <a
-              href="https://wa.me/919226221871"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center justify-center space-x-2 text-gray-700 hover:text-purple-600 transition-colors duration-200"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-5 w-5"
-                fill="currentColor"
-                viewBox="0 0 24 24"
+      {/* Contact Links Section */}
+      <section className="py-16 px-4 bg-purple-50">
+        <div className="max-w-6xl mx-auto">
+          <h2 className="text-3xl font-semibold mb-6 text-center">Connect with Vicky</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+            {contactLinks.map(({ label, url, display, icon }) => (
+              <a
+                key={label}
+                href={url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-4 p-4 bg-white rounded-lg shadow-md border border-purple-200
+                  hover:bg-purple-600 hover:text-white transition"
               >
-                <path d="M20.52 3.48a12.07 12.07 0 0 0-17.04 0 12.03 12.03 0 0 0-2.79 12.68L.01 23l6.98-1.82a12.07 12.07 0 0 0 6.52 1.82 12.03 12.03 0 0 0 8.5-3.52 12.07 12.07 0 0 0 0-17.04zm-8.48 17.52c-1.96 0-3.87-.52-5.54-1.5l-.4-.23-4.15 1.08 1.11-4.05-.26-.42a9.93 9.93 0 0 1 1.56-12.37 9.95 9.95 0 0 1 14.08 0 9.93 9.93 0 0 1 0 14.07 9.95 9.95 0 0 1-6.4 2.42zm5.63-7.5c-.31-.15-1.84-.91-2.13-1.01-.29-.11-.5-.15-.7.15s-.8 1.01-.98 1.22c-.18.2-.36.22-.67.07-.31-.15-1.31-.48-2.5-1.52a9.4 9.4 0 0 1-1.74-2.15c-.18-.31-.02-.48.13-.63.13-.13.31-.34.47-.52.15-.18.2-.31.31-.52.1-.2.05-.38-.02-.53-.07-.15-.7-1.68-.96-2.3-.25-.6-.5-.52-.7-.53l-.6-.01a1.15 1.15 0 0 0-.84.39 3.52 3.52 0 0 0-1.1 2.63c0 1.54 1.11 3.03 1.26 3.24.15.2 2.2 3.37 5.35 4.72.75.33 1.33.53 1.79.67.75.24 1.44.2 1.98.12.6-.09 1.84-.75 2.1-1.47.26-.73.26-1.36.18-1.5-.07-.14-.27-.22-.57-.37z" />
-              </svg>
-              <span>Chat on WhatsApp</span>
-            </a>
+                <span className="text-2xl">{icon}</span>
+                <div>
+                  <p className="font-semibold">{label}</p>
+                  <p className="text-sm">{display ?? url.replace(/^https?:\/\//, "")}</p>
+                </div>
+              </a>
+            ))}
+          </div>
+        </div>
+      </section>
 
-            {/* Email */}
-            <a
-              href="mailto:vikkitembhurne358@gmail.com"
-              className="flex items-center justify-center space-x-2 text-gray-700 hover:text-purple-600 transition-colors duration-200"
-            >
-              <Mail className="w-5 h-5" />
-              <span>vikkitembhurne358@gmail.com</span>
-            </a>
-
-            {/* Instagram */}
-            <a
-              href="https://www.instagram.com/artistic.vicky/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center justify-center space-x-2 text-gray-700 hover:text-purple-600 transition-colors duration-200"
-            >
-              <Instagram className="w-5 h-5" />
-              <span>@artistic.vicky</span>
-            </a>
-
-            {/* YouTube */}
-            <a
-              href="https://www.youtube.com/@ArtisticVicky"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center justify-center space-x-2 text-gray-700 hover:text-purple-600 transition-colors duration-200"
-            >
-              <Youtube className="w-5 h-5" />
-              <span>@ArtisticVicky</span>
-            </a>
-
-            {/* Facebook */}
-            <a
-              href="https://www.facebook.com/mayur.tembhurne.148"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center justify-center space-x-2 text-gray-700 hover:text-purple-600 transition-colors duration-200"
-            >
-              <Facebook className="w-5 h-5" />
-              <span>Vicky Tembhurne</span>
-            </a>
+      {/* Product Links Section */}
+      <section id="links" className="py-16 px-4 bg-white">
+        <div className="max-w-6xl mx-auto">
+          <h2 className="text-3xl font-semibold mb-6 text-center">Recommended Art Materials</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+            {productLinks.map(({ label, url }) => (
+              <a
+                key={label}
+                href={url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="block p-4 bg-white rounded-lg shadow-md border border-purple-200 text-purple-700
+                  hover:bg-purple-600 hover:text-white transition text-center font-medium"
+              >
+                {label}
+              </a>
+            ))}
           </div>
         </div>
       </section>
