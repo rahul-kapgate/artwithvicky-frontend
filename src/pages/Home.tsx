@@ -186,12 +186,14 @@ export default function Home() {
             Join us now to fuel your creativity and conquer your BFA exams! <span className="inline-block text-purple-600 text-2xl">🏆</span>
           </p>
 
-          <Badge
-            variant="outline"
-            className="text-purple-600 border-purple-500 text-sm font-semibold px-4 py-2"
-          >
-            Based in India · Available for commissions
-          </Badge>
+          <div className="flex justify-center">
+            <Badge
+              variant="outline"
+              className="text-purple-600 border-purple-500 text-sm font-semibold px-4 py-2 text-center"
+            >
+              Based in India · Available for commissions
+            </Badge>
+          </div>
         </div>
       </section>
 
