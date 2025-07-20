@@ -19,11 +19,38 @@ interface Artwork {
 }
 
 const contactLinks = [
-  { label: "Website", url: "https://artisticvicky.netlify.app/", icon: "🌐" },
-  { label: "WhatsApp", url: "https://wa.me/9226221871", display: "9226221871", icon: "📱" },
-  { label: "E-mail", url: "mailto:vikkitembhurne358@gmail.com", display: "vikkitembhurne358@gmail.com", icon: "✉️" },
-  { label: "WhatsApp Group", url: "https://chat.whatsapp.com/LYEPtRmEj9L...", icon: "👥" },
-  { label: "Instagram", url: "https://www.instagram.com/artistic.vicky/", icon: "📸" },
+  {
+    label: "WhatsApp",
+    url: "https://wa.me/9226221871",
+    display: "9226221871",
+    icon: "📱",
+  },
+  {
+    label: "E-mail",
+    url: "mailto:vikkitembhurne358@gmail.com",
+    display: "vikkitembhurne358@gmail.com",
+    icon: "✉️",
+  },
+  {
+    label: "WhatsApp Group",
+    url: "https://chat.whatsapp.com/LYEPtRmEj9L2CbbOZCaERz",
+    icon: "👥",
+  },
+  {
+    label: "Instagram",
+    url: "https://www.instagram.com/artistic.vicky/",
+    icon: "📸",
+  },
+  {
+    label: "YouTube",
+    url: "https://www.youtube.com/@artisticvicky",
+    icon: "🎥",
+  },
+  {
+    label: "Facebook",
+    url: "https://www.facebook.com/mayur.tembhurne.148",
+    icon: "👥",
+  },
 ];
 
 const productLinks = [
@@ -198,7 +225,7 @@ export default function Home() {
       </section>
 
       {/* Contact Links Section */}
-      <section className="py-16 px-4 bg-purple-50">
+      <section id="contact" className="py-16 px-4 bg-purple-50">
         <div className="max-w-6xl mx-auto">
           <h2 className="text-3xl font-semibold mb-6 text-center">Connect with Vicky</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
