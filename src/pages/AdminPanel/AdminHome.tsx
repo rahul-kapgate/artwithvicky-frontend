@@ -4,10 +4,11 @@ import { Card } from "@/components/ui/card";
 import CourseAssignment from "./CourseAssignment.tsx";
 import UploadPDF from "./UploadPDF.tsx";
 import UploadImage from "./UploadImage.tsx";
+import UploadVideo from "./UploadVideo.tsx";
 
 function AdminHome() {
   const [activeTab, setActiveTab] = useState<
-    "assignment" | "upload" | "images"
+    "assignment" | "upload" | "images" | "videos"
   >("assignment");
 
   return (
@@ -17,7 +18,9 @@ function AdminHome() {
         <h1 className="text-2xl sm:text-4xl font-bold">
           Admin <span className="text-purple-600">Dashboard</span>
         </h1>
-        <p className="text-sm sm:text-base text-gray-600 mt-2">Manage your platform operations</p>
+        <p className="text-sm sm:text-base text-gray-600 mt-2">
+          Manage your platform operations
+        </p>
       </header>
 
       {/* Tabs */}
@@ -44,6 +47,13 @@ function AdminHome() {
           >
             🖼️ Upload Images
           </Button>
+          <Button
+            variant={activeTab === "videos" ? "default" : "outline"}
+            onClick={() => setActiveTab("videos")}
+            className="w-full sm:w-auto text-sm sm:text-base"
+          >
+            🎥 Upload Videos
+          </Button>
         </div>
 
         {/* Content */}
@@ -51,6 +61,7 @@ function AdminHome() {
           {activeTab === "assignment" && <CourseAssignment />}
           {activeTab === "upload" && <UploadPDF />}
           {activeTab === "images" && <UploadImage />}
+          {activeTab === "videos" && <UploadVideo />}
         </Card>
       </section>
     </div>
