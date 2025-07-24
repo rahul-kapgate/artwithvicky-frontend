@@ -16,8 +16,17 @@ function UploadVideo() {
   const [description, setDescription] = useState("");
   const [videoUrl, setVideoUrl] = useState("");
   const [videos, setVideos] = useState<Video[]>([]);
+  const [showConfirm, setShowConfirm] = useState(false);
+  const [selectedVideoId, setSelectedVideoId] = useState<string | null>(null);
+
 
   const token = localStorage.getItem("accessToken");
+
+  const confirmDelete = (id: string) => {
+    setSelectedVideoId(id);
+    setShowConfirm(true);
+  };
+
 
   // Fetch all videos
   useEffect(() => {
@@ -74,11 +83,42 @@ function UploadVideo() {
     }
   };
 
+  const handleDelete = async (id: string) => {
+    if (!selectedVideoId) return;
+
+    try {
+      const res = await fetch(
+        `https://artwithvicky-backend.onrender.com/api/videos/delete-video/${id}`,
+        {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      const result = await res.json();
+
+      if (!res.ok) throw new Error(result.message || "Delete failed");
+
+      toast.success("Video deleted successfully");
+      fetchVideos(); // Refresh list
+    } catch (err: any) {
+      toast.error(err.message || "Delete failed");
+    } finally {
+      setShowConfirm(false);
+      setSelectedVideoId(null);
+    }
+  };
+
+ 
   return (
     <div className="max-w-4xl mx-auto py-10">
       <h2 className="text-2xl font-semibold mb-6 text-center">
         🎥 Upload Video
       </h2>
+
+      {/* Upload Form */}
       <form onSubmit={handleSubmit} className="space-y-5">
         <div>
           <Label>Title</Label>
@@ -132,7 +172,7 @@ function UploadVideo() {
         </Button>
       </form>
 
-      {/* Display Uploaded Videos */}
+      {/* Uploaded Videos */}
       <div className="mt-10">
         <h3 className="text-xl font-semibold mb-4">📂 Uploaded Videos</h3>
         {videos.length === 0 && (
@@ -142,7 +182,7 @@ function UploadVideo() {
           {videos.map((video) => (
             <div
               key={video._id}
-              className="border rounded-lg overflow-hidden shadow"
+              className="border rounded-lg overflow-hidden shadow relative"
             >
               <iframe
                 src={video.videoUrl.replace("youtu.be", "youtube.com/embed")}
@@ -153,13 +193,46 @@ function UploadVideo() {
               <div className="p-4">
                 <h4 className="font-semibold">{video.title}</h4>
                 <p className="text-sm text-gray-600">{video.description}</p>
+                <Button
+                  variant="destructive"
+                  className="mt-2 bg-red-600 hover:bg-red-700 text-white"
+                  onClick={() => confirmDelete(video._id)}
+                >
+                  Delete
+                </Button>
               </div>
             </div>
           ))}
         </div>
       </div>
+
+      {/* Delete Confirmation Modal */}
+      {showConfirm && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50">
+          <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-sm">
+            <h3 className="text-lg font-semibold mb-2">Confirm Delete</h3>
+            <p className="text-sm text-gray-600 mb-4">
+              Are you sure you want to delete this video?
+            </p>
+            <div className="flex justify-end space-x-3">
+              <Button variant="outline" onClick={() => setShowConfirm(false)}>
+                Cancel
+              </Button>
+              <Button
+                variant="destructive"
+                onClick={() => handleDelete(selectedVideoId!)}
+              >
+                Delete
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
+
+
+
 }
 
 export default UploadVideo;
