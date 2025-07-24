@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
@@ -20,17 +20,17 @@ function UploadVideo() {
   const token = localStorage.getItem("accessToken");
 
   // Fetch all videos
-//   useEffect(() => {
-//     fetchVideos();
-//   }, []);
+  useEffect(() => {
+    fetchVideos();
+  }, []);
 
   const fetchVideos = async () => {
     try {
       const res = await fetch(
-        "https://artwithvicky-backend.onrender.com/api/videos/get-videos"
+        "https://artwithvicky-backend.onrender.com/api/videos/get-all-videos"
       );
       const data = await res.json();
-      setVideos(data.data || []);
+      setVideos(data|| []);
     } catch (err) {
       toast.error("Failed to fetch videos");
     }
@@ -135,6 +135,9 @@ function UploadVideo() {
       {/* Display Uploaded Videos */}
       <div className="mt-10">
         <h3 className="text-xl font-semibold mb-4">📂 Uploaded Videos</h3>
+        {videos.length === 0 && (
+          <p className="text-gray-600">No videos uploaded yet</p>
+        )}
         <div className="grid md:grid-cols-3 sm:grid-cols-2 gap-6">
           {videos.map((video) => (
             <div
