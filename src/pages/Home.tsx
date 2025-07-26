@@ -67,7 +67,7 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-purple-50 via-white to-white text-gray-800 scroll-smooth">
 
-      {/* Hero */}
+      {/* Hero Section */}
       <section className="text-center py-20 px-4">
         <div className="max-w-4xl mx-auto">
           <h1 className="text-5xl font-bold mb-4">
@@ -85,14 +85,15 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Gallery */}
-      <section id="gallery" className="py-16 bg-white px-4">
-        <div className="max-w-6xl mx-auto">
+      {/* Gallery Section */}
+      <section id="gallery" className="relative overflow-hidden py-16 bg-white px-4">
+        <div className="absolute -top-20 -left-20 w-56 h-56 bg-purple-200 rounded-full opacity-20 animate-pulse" />
+        <div className="absolute -bottom-20 -right-20 w-56 h-56 bg-purple-300 rounded-full opacity-30 animate-pulse animation-delay-2000" />
+        <div className="relative z-10 max-w-6xl mx-auto">
           <h2 className="text-3xl font-semibold text-center mb-10">Featured Artworks</h2>
           <Swiper
             modules={[Autoplay]}
             autoplay={{ delay: 2000, disableOnInteraction: false, pauseOnMouseEnter: true }}
-            mousewheel={{ forceToAxis: true }}
             spaceBetween={20}
             breakpoints={{
               0: { slidesPerView: 1 },
@@ -100,7 +101,6 @@ export default function Home() {
               1024: { slidesPerView: 3 },
             }}
             loop={true}
-            touchRatio={1.5}
             grabCursor={true}
           >
             {artworks.length > 0 ? (
@@ -113,7 +113,6 @@ export default function Home() {
                           src={art.imageUrl}
                           alt={art.title}
                           className="w-full h-full object-cover"
-                          onError={() => console.error(`Image load failed: ${art.imageUrl}`)}
                         />
                       </div>
                       <h3 className="text-xl font-medium">{art.title}</h3>
@@ -131,9 +130,11 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Courses */}
-      <section id="courses" className="py-20 bg-white px-4">
-        <div className="max-w-4xl mx-auto text-center">
+      {/* Courses Section */}
+      <section id="courses" className="relative overflow-hidden py-20 bg-white px-4">
+        <div className="absolute -top-16 -left-16 w-48 h-48 bg-purple-300 rounded-full opacity-20 animate-pulse" />
+        <div className="absolute -bottom-16 -right-16 w-48 h-48 bg-purple-400 rounded-full opacity-30 animate-pulse animation-delay-2000" />
+        <div className="relative z-10 max-w-4xl mx-auto text-center">
           <h2 className="text-3xl font-semibold mb-4">Our Courses</h2>
           <p className="text-gray-700 text-lg mb-6">
             Unlock your creativity and build your skills with our exclusive art courses.
@@ -147,36 +148,16 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Fancy About Us */}
+      {/* About Us Section (Already Styled) */}
       <section
         id="about"
         className="py-20 px-6 bg-gradient-to-r from-purple-100 via-purple-50 to-purple-100 relative overflow-hidden"
       >
-        {/* Decorative animated circles */}
         <div className="absolute -top-16 -left-16 w-48 h-48 bg-purple-300 rounded-full opacity-20 animate-pulse"></div>
         <div className="absolute -bottom-16 -right-16 w-48 h-48 bg-purple-400 rounded-full opacity-30 animate-pulse animation-delay-2000"></div>
 
         <div className="max-w-4xl mx-auto bg-white rounded-3xl shadow-xl p-12 relative z-10">
           <h2 className="text-4xl font-extrabold mb-6 flex items-center justify-center gap-3 text-purple-700">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-10 w-10 text-purple-600"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-              strokeWidth={2}
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M12 8c-1.657 0-3 1.567-3 3.5S10.343 15 12 15s3-1.567 3-3.5S13.657 8 12 8z"
-              />
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M12 15v4m0 0H9m3 0h3"
-              />
-            </svg>
             About Us
           </h2>
 
@@ -196,8 +177,10 @@ export default function Home() {
       </section>
 
       {/* Contact Links Section */}
-      <section className="py-16 px-4 bg-purple-50">
-        <div className="max-w-6xl mx-auto">
+      <section className="relative overflow-hidden py-16 px-4 bg-purple-50">
+        <div className="absolute -top-16 -left-16 w-48 h-48 bg-purple-200 rounded-full opacity-20 animate-pulse"></div>
+        <div className="absolute -bottom-16 -right-16 w-48 h-48 bg-purple-300 rounded-full opacity-30 animate-pulse animation-delay-2000"></div>
+        <div className="relative z-10 max-w-6xl mx-auto">
           <h2 className="text-3xl font-semibold mb-6 text-center">Connect with Vicky</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
             {contactLinks.map(({ label, url, display, icon }) => (
@@ -221,8 +204,10 @@ export default function Home() {
       </section>
 
       {/* Product Links Section */}
-      <section id="links" className="py-16 px-4 bg-white">
-        <div className="max-w-6xl mx-auto">
+      <section id="links" className="relative overflow-hidden py-16 px-4 bg-white">
+        <div className="absolute -top-16 -left-16 w-48 h-48 bg-purple-200 rounded-full opacity-20 animate-pulse"></div>
+        <div className="absolute -bottom-16 -right-16 w-48 h-48 bg-purple-300 rounded-full opacity-30 animate-pulse animation-delay-2000"></div>
+        <div className="relative z-10 max-w-6xl mx-auto">
           <h2 className="text-3xl font-semibold mb-6 text-center">Recommended Art Materials</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
             {productLinks.map(({ label, url }) => (
