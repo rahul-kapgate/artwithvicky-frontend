@@ -36,7 +36,7 @@ export const fetchWithAuth = async (url: string, options: FetchOptions = {}): Pr
 
     // Call refresh token API
     const refreshResponse = await fetch(
-      "https://artwithvicky-backend.onrender.com/api/auth/refresh-token",
+      "https://artwithvicky-backend.onrender.com/api/users/refresh-token",
       {
         method: "POST",
         headers: {
@@ -45,6 +45,8 @@ export const fetchWithAuth = async (url: string, options: FetchOptions = {}): Pr
         body: JSON.stringify({ refreshToken }),
       }
     );
+
+    console.log("refreshResponse", refreshResponse);
 
     if (!refreshResponse.ok) {
       throw new Error("Failed to refresh token");
