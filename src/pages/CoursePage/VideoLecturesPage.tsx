@@ -103,7 +103,7 @@ const VideoLecturesPage: React.FC = () => {
 
           <Card className="rounded-2xl shadow-lg overflow-hidden">
             <CardContent className="p-0">
-              <div className="aspect-video w-full">
+              <div className="aspect-video w-full relative">
                 <iframe
                   src={getYouTubeEmbedUrl(selectedVideo.videoUrl)}
                   title={selectedVideo.title}
@@ -112,7 +112,11 @@ const VideoLecturesPage: React.FC = () => {
                   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                   allowFullScreen
                 />
+
+                {/* Transparent overlay to disable interaction */}
+                <div className="absolute inset-0 z-10 cursor-not-allowed bg-transparent" />
               </div>
+
               <div className="p-6">
                 <h1 className="text-2xl font-bold mb-3 text-gray-800">
                   {selectedVideo.title}
