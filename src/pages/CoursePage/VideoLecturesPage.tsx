@@ -26,6 +26,9 @@ const VideoLecturesPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedVideo, setSelectedVideo] = useState<Video | null>(null);
+  const [volume, setVolume] = useState(100); // Volume from 0–100
+  const [progress, setProgress] = useState(0); // Progress in seconds
+  const [duration, setDuration] = useState(0); // Video duration in seconds
 
   const playerRef = useRef<any>(null);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -85,7 +88,20 @@ const VideoLecturesPage: React.FC = () => {
         events: {
           onReady: () => {
             setMuted(playerRef.current.isMuted());
+            setVolume(playerRef.current.getVolume());
+            setDuration(playerRef.current.getDuration());
+
+            // Track progress every second
+            setInterval(() => {
+              if (
+                playerRef.current &&
+                typeof playerRef.current.getCurrentTime === "function"
+              ) {
+                setProgress(playerRef.current.getCurrentTime());
+              }
+            }, 1000);
           },
+
           onStateChange: (event: any) => {
             setIsPlaying(event.data === 1); // 1 = playing
           },
@@ -126,6 +142,35 @@ const VideoLecturesPage: React.FC = () => {
     const currentTime = playerRef.current.getCurrentTime();
     playerRef.current.seekTo(currentTime + seconds, true);
   };
+
+  const handleVolumeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newVolume = Number(e.target.value);
+    setVolume(newVolume);
+    if (playerRef.current) {
+      playerRef.current.setVolume(newVolume);
+      setMuted(newVolume === 0);
+    }
+  };
+
+  const handleProgressChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newTime = Number(e.target.value);
+    if (playerRef.current) {
+      playerRef.current.seekTo(newTime, true);
+      setProgress(newTime);
+    }
+  };
+
+  const formatTime = (seconds: number): string => {
+    const minutes = Math.floor(seconds / 60);
+    const secs = Math.floor(seconds % 60);
+    return `${String(minutes).padStart(2, "0")}:${String(secs).padStart(
+      2,
+      "0"
+    )}`;
+  };
+
+
+
 
   if (loading) {
     return (
@@ -188,10 +233,11 @@ const VideoLecturesPage: React.FC = () => {
                 </p>
               </div>
 
-              <div className="flex justify-center items-center gap-4 py-4 border-t px-6 bg-gray-100">
+              <div className="flex justify-center items-center gap-4 py-4 border-t px-6 bg-gray-100 flex-wrap">
                 <Button onClick={() => skipTime(-10)} variant="outline">
                   <RotateCcw className="w-5 h-5" /> -10s
                 </Button>
+
                 <Button onClick={togglePlayPause}>
                   {isPlaying ? (
                     <Pause className="w-5 h-5" />
@@ -199,6 +245,7 @@ const VideoLecturesPage: React.FC = () => {
                     <Play className="w-5 h-5" />
                   )}
                 </Button>
+
                 <Button onClick={toggleMute}>
                   {muted ? (
                     <VolumeX className="w-5 h-5" />
@@ -206,9 +253,34 @@ const VideoLecturesPage: React.FC = () => {
                     <Volume2 className="w-5 h-5" />
                   )}
                 </Button>
+
+                <input
+                  type="range"
+                  min="0"
+                  max="100"
+                  value={volume}
+                  onChange={handleVolumeChange}
+                  className="w-24"
+                />
+
                 <Button onClick={() => skipTime(10)} variant="outline">
                   +10s <RotateCw className="w-5 h-5" />
                 </Button>
+
+                {/* Progress Bar */}
+                <div className="px-6 py-2 bg-gray-100">
+                  <input
+                    type="range"
+                    min="0"
+                    max={duration}
+                    value={progress}
+                    onChange={handleProgressChange}
+                    className="w-full"
+                  />
+                  <div className="text-xs text-gray-500 mt-1 text-center">
+                    {formatTime(progress)} / {formatTime(duration)}{formatTime(progress)} / {formatTime(duration)}
+                  </div>
+                </div>
               </div>
             </CardContent>
           </Card>
