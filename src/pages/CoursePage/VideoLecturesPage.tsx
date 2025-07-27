@@ -1,5 +1,14 @@
-import { useState, useEffect } from "react";
-import { AlertCircle, Play, ArrowLeft } from "lucide-react";
+import { useState, useEffect, useRef } from "react";
+import {
+  AlertCircle,
+  Play,
+  ArrowLeft,
+  Pause,
+  Volume2,
+  VolumeX,
+  RotateCcw,
+  RotateCw,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 
@@ -18,6 +27,10 @@ const VideoLecturesPage: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [selectedVideo, setSelectedVideo] = useState<Video | null>(null);
 
+  const playerRef = useRef<any>(null);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [muted, setMuted] = useState(false);
+
   useEffect(() => {
     fetchVideos();
   }, []);
@@ -27,11 +40,8 @@ const VideoLecturesPage: React.FC = () => {
       const response = await fetch(
         "https://artwithvicky-backend.onrender.com/api/videos/get-all-videos"
       );
-
-      if (!response.ok) {
+      if (!response.ok)
         throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
       const data = await response.json();
       setVideos(Array.isArray(data) ? data : []);
     } catch (err) {
@@ -41,14 +51,11 @@ const VideoLecturesPage: React.FC = () => {
     }
   };
 
-  console.log(videos, "opopp")
-
-  const getYouTubeEmbedUrl = (url: string) => {
-    // Extract video ID from various YouTube URL formats
+  const getYouTubeVideoId = (url: string) => {
     const regex =
       /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/;
     const match = url.match(regex);
-    return match ? `https://www.youtube.com/embed/${match[1]}` : url;
+    return match ? match[1] : "";
   };
 
   const handleVideoClick = (video: Video) => {
@@ -57,38 +64,94 @@ const VideoLecturesPage: React.FC = () => {
 
   const handleBackToList = () => {
     setSelectedVideo(null);
+    setIsPlaying(false);
+    setMuted(false);
+    if (playerRef.current) {
+      playerRef.current.stopVideo();
+      playerRef.current.destroy();
+      playerRef.current = null;
+    }
+  };
+
+  // Initialize YouTube player when video is selected
+  useEffect(() => {
+    if (!selectedVideo) return;
+
+    const videoId = getYouTubeVideoId(selectedVideo.videoUrl);
+
+    const onYouTubeIframeAPIReady = () => {
+      playerRef.current = new (window as any).YT.Player("yt-player", {
+        videoId,
+        events: {
+          onReady: () => {
+            setMuted(playerRef.current.isMuted());
+          },
+          onStateChange: (event: any) => {
+            setIsPlaying(event.data === 1); // 1 = playing
+          },
+        },
+      });
+    };
+
+    if (!(window as any).YT || !(window as any).YT.Player) {
+      const tag = document.createElement("script");
+      tag.src = "https://www.youtube.com/iframe_api";
+      const firstScriptTag = document.getElementsByTagName("script")[0];
+      firstScriptTag?.parentNode?.insertBefore(tag, firstScriptTag);
+      (window as any).onYouTubeIframeAPIReady = onYouTubeIframeAPIReady;
+    } else {
+      onYouTubeIframeAPIReady();
+    }
+  }, [selectedVideo]);
+
+  const togglePlayPause = () => {
+    if (!playerRef.current) return;
+    if (isPlaying) playerRef.current.pauseVideo();
+    else playerRef.current.playVideo();
+  };
+
+  const toggleMute = () => {
+    if (!playerRef.current) return;
+    if (muted) {
+      playerRef.current.unMute();
+      setMuted(false);
+    } else {
+      playerRef.current.mute();
+      setMuted(true);
+    }
+  };
+
+  const skipTime = (seconds: number) => {
+    if (!playerRef.current) return;
+    const currentTime = playerRef.current.getCurrentTime();
+    playerRef.current.seekTo(currentTime + seconds, true);
   };
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-purple-50 via-white to-white">
-        <div className="flex flex-col items-center justify-center py-20">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mb-4" />
-          <p className="text-gray-600">Loading video lectures...</p>
-        </div>
+      <div className="min-h-screen bg-gradient-to-b from-purple-50 via-white to-white flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mb-4" />
+        <p className="ml-4 text-gray-600">Loading video lectures...</p>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-purple-50 via-white to-white">
-        <div className="text-center py-20">
-          <AlertCircle className="h-10 w-10 text-red-500 mx-auto mb-2" />
-          <p className="text-lg text-red-600 font-medium">Error:</p>
-          <p className="text-gray-600">{error}</p>
-          <Button
-            onClick={fetchVideos}
-            className="mt-4 bg-purple-600 hover:bg-purple-700"
-          >
-            Try Again
-          </Button>
-        </div>
+      <div className="min-h-screen bg-gradient-to-b from-purple-50 via-white to-white text-center py-20">
+        <AlertCircle className="h-10 w-10 text-red-500 mx-auto mb-2" />
+        <p className="text-lg text-red-600 font-medium">Error:</p>
+        <p className="text-gray-600">{error}</p>
+        <Button
+          onClick={fetchVideos}
+          className="mt-4 bg-purple-600 hover:bg-purple-700"
+        >
+          Try Again
+        </Button>
       </div>
     );
   }
 
-  // If a video is selected, show the video player
   if (selectedVideo) {
     return (
       <div className="min-h-screen bg-gradient-to-b from-purple-50 via-white to-white">
@@ -104,17 +167,12 @@ const VideoLecturesPage: React.FC = () => {
           <Card className="rounded-2xl shadow-lg overflow-hidden">
             <CardContent className="p-0">
               <div className="aspect-video w-full relative">
-                <iframe
-                  src={getYouTubeEmbedUrl(selectedVideo.videoUrl)}
-                  title={selectedVideo.title}
-                  className="w-full h-full"
-                  frameBorder="0"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                  allowFullScreen
+                <div
+                  id="yt-player"
+                  className="w-full h-full pointer-events-none"
                 />
 
-                {/* Transparent overlay to disable interaction */}
-                <div className="absolute inset-0 z-10 cursor-not-allowed bg-transparent" />
+                <div className="absolute inset-0 z-10 pointer-events-none bg-transparent" />
               </div>
 
               <div className="p-6">
@@ -124,12 +182,33 @@ const VideoLecturesPage: React.FC = () => {
                 <p className="text-gray-600 mb-4 leading-relaxed">
                   {selectedVideo.description}
                 </p>
-                <div className="text-sm text-gray-500">
-                  <p>
-                    Uploaded:{" "}
-                    {new Date(selectedVideo.createdAt).toLocaleDateString()}
-                  </p>
-                </div>
+                <p className="text-sm text-gray-500">
+                  Uploaded:{" "}
+                  {new Date(selectedVideo.createdAt).toLocaleDateString()}
+                </p>
+              </div>
+
+              <div className="flex justify-center items-center gap-4 py-4 border-t px-6 bg-gray-100">
+                <Button onClick={() => skipTime(-10)} variant="outline">
+                  <RotateCcw className="w-5 h-5" /> -10s
+                </Button>
+                <Button onClick={togglePlayPause}>
+                  {isPlaying ? (
+                    <Pause className="w-5 h-5" />
+                  ) : (
+                    <Play className="w-5 h-5" />
+                  )}
+                </Button>
+                <Button onClick={toggleMute}>
+                  {muted ? (
+                    <VolumeX className="w-5 h-5" />
+                  ) : (
+                    <Volume2 className="w-5 h-5" />
+                  )}
+                </Button>
+                <Button onClick={() => skipTime(10)} variant="outline">
+                  +10s <RotateCw className="w-5 h-5" />
+                </Button>
               </div>
             </CardContent>
           </Card>
@@ -138,7 +217,6 @@ const VideoLecturesPage: React.FC = () => {
     );
   }
 
-  // Show video list
   return (
     <div className="min-h-screen bg-gradient-to-b from-purple-50 via-white to-white text-gray-800">
       <section className="py-12 px-4">
@@ -165,11 +243,9 @@ const VideoLecturesPage: React.FC = () => {
                       <div className="bg-purple-100 p-3 rounded-full">
                         <Play className="h-6 w-6 text-purple-600" />
                       </div>
-                      <div className="flex-1">
-                        <h3 className="font-semibold text-lg text-gray-800 line-clamp-2">
-                          {video.title}
-                        </h3>
-                      </div>
+                      <h3 className="font-semibold text-lg text-gray-800 line-clamp-2">
+                        {video.title}
+                      </h3>
                     </div>
 
                     <p className="text-gray-600 text-sm mb-4 line-clamp-3">
