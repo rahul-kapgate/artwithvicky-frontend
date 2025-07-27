@@ -278,7 +278,7 @@ const VideoLecturesPage: React.FC = () => {
                     className="w-full"
                   />
                   <div className="text-xs text-gray-500 mt-1 text-center">
-                    {formatTime(progress)} / {formatTime(duration)}{formatTime(progress)} / {formatTime(duration)}
+                    {formatTime(progress)} / {formatTime(duration)}
                   </div>
                 </div>
               </div>
