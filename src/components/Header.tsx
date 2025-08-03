@@ -3,8 +3,11 @@ import { Link, useLocation } from "react-router-dom";
 import { Menu, X, Settings } from "lucide-react";
 import AuthModal from "../pages/AuthModal";
 import { useAuth } from "@/context/AuthContext";
+import { useNavigate } from "react-router-dom";
+
 
 export default function Header() {
+  const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
   const [modalMode, setModalMode] = useState<
@@ -84,7 +87,10 @@ export default function Header() {
             </Link>
             {user ? (
               <>
-                <div className="w-8 h-8 rounded-full bg-gradient-to-r from-purple-500 via-purple-600 to-purple-800 text-white flex items-center justify-center font-bold text-lg">
+                <div
+                  onClick={() => navigate("/profile")}
+                  className="w-8 h-8 rounded-full bg-gradient-to-r from-purple-500 via-purple-600 to-purple-800 text-white flex items-center justify-center font-bold text-lg cursor-pointer"
+                >
                   {user.fullName.charAt(0).toUpperCase()}
                 </div>
                 {/* Admin Panel Link - Only visible to admins */}
@@ -154,7 +160,11 @@ export default function Header() {
               onClick={() => setMenuOpen(!menuOpen)}
               className="text-purple-600"
             >
-              {menuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+              {menuOpen ? (
+                <X className="w-6 h-6" />
+              ) : (
+                <Menu className="w-6 h-6" />
+              )}
             </button>
           </div>
         </div>

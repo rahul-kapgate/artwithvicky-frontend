@@ -19,11 +19,38 @@ interface Artwork {
 }
 
 const contactLinks = [
-  { label: "Website", url: "https://artisticvicky.netlify.app/", icon: "🌐" },
-  { label: "WhatsApp", url: "https://wa.me/9226221871", display: "9226221871", icon: "📱" },
-  { label: "E-mail", url: "mailto:vikkitembhurne358@gmail.com", display: "vikkitembhurne358@gmail.com", icon: "✉️" },
-  { label: "WhatsApp Group", url: "https://chat.whatsapp.com/LYEPtRmEj9L...", icon: "👥" },
-  { label: "Instagram", url: "https://www.instagram.com/artistic.vicky/", icon: "📸" },
+  {
+    label: "WhatsApp",
+    url: "https://wa.me/9226221871",
+    display: "9226221871",
+    icon: "📱",
+  },
+  {
+    label: "E-mail",
+    url: "mailto:vikkitembhurne358@gmail.com",
+    display: "vikkitembhurne358@gmail.com",
+    icon: "✉️",
+  },
+  {
+    label: "WhatsApp Group",
+    url: "https://chat.whatsapp.com/LYEPtRmEj9L2CbbOZCaERz",
+    icon: "👥",
+  },
+  {
+    label: "Instagram",
+    url: "https://www.instagram.com/artistic.vicky/",
+    icon: "📸",
+  },
+  {
+    label: "YouTube",
+    url: "https://www.youtube.com/@artisticvicky",
+    icon: "🎥",
+  },
+  {
+    label: "Facebook",
+    url: "https://www.facebook.com/mayur.tembhurne.148",
+    icon: "👥",
+  },
 ];
 
 const productLinks = [
@@ -167,20 +194,20 @@ export default function Home() {
             Join us now to fuel your creativity and conquer your BFA exams! <span className="inline-block text-purple-600 text-2xl">🏆</span>
           </p>
 
-          <Badge
-            variant="outline"
-            className="text-purple-600 border-purple-500 text-sm font-semibold px-4 py-2"
-          >
-            Based in India · Available for commissions
-          </Badge>
+          <div className="flex justify-center">
+            <Badge
+              variant="outline"
+              className="text-purple-600 border-purple-500 text-sm font-semibold px-4 py-2 text-center"
+            >
+              Based in India · Available for commissions
+            </Badge>
+          </div>
         </div>
       </section>
 
       {/* Contact Links Section */}
-      <section className="relative overflow-hidden py-16 px-4 bg-purple-50">
-        <div className="absolute -top-16 -left-16 w-48 h-48 bg-purple-200 rounded-full opacity-20 animate-pulse"></div>
-        <div className="absolute -bottom-16 -right-16 w-48 h-48 bg-purple-300 rounded-full opacity-30 animate-pulse animation-delay-2000"></div>
-        <div className="relative z-10 max-w-6xl mx-auto">
+      <section className="py-16 px-4 bg-purple-50">
+        <div className="max-w-6xl mx-auto">
           <h2 className="text-3xl font-semibold mb-6 text-center">Connect with Vicky</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
             {contactLinks.map(({ label, url, display, icon }) => (
