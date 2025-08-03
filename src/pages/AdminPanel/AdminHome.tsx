@@ -5,10 +5,11 @@ import CourseAssignment from "./CourseAssignment.tsx";
 import UploadPDF from "./UploadPDF.tsx";
 import UploadImage from "./UploadImage.tsx";
 import UploadVideo from "./UploadVideo.tsx";
+import MockTestMarks from "./MockTestMarks.tsx";
 
 function AdminHome() {
   const [activeTab, setActiveTab] = useState<
-    "assignment" | "upload" | "images" | "videos"
+    "assignment" | "upload" | "images" | "videos" | "mocktest"
   >("assignment");
 
   return (
@@ -54,6 +55,13 @@ function AdminHome() {
           >
             🎥 Upload Videos
           </Button>
+          <Button
+            variant={activeTab === "mocktest" ? "default" : "outline"}
+            onClick={() => setActiveTab("mocktest")}
+            className="w-full sm:w-auto text-sm sm:text-base"
+          >
+            📝 Mock Test Marks
+          </Button>
         </div>
 
         {/* Content */}
@@ -62,6 +70,7 @@ function AdminHome() {
           {activeTab === "upload" && <UploadPDF />}
           {activeTab === "images" && <UploadImage />}
           {activeTab === "videos" && <UploadVideo />}
+          {activeTab === "mocktest" && <MockTestMarks />}
         </Card>
       </section>
     </div>
