@@ -8,6 +8,7 @@ interface Question {
   question: string;
   options: string[];
   correctOption: string;
+  img?: string; // Added optional img property to match JSON data
 }
 
 const MockTestPage: React.FC = () => {
@@ -261,6 +262,22 @@ const MockTestPage: React.FC = () => {
                       <p className="font-medium mb-2">
                         {index + 1}. {q.question}
                       </p>
+                      {/* Display image if available */}
+                      {q.img && (
+                        <div className="mb-4">
+                          <img
+                            src={q.img}
+                            alt="Question illustration"
+                            className="max-w-full h-auto rounded-md shadow-sm"
+                            style={{ maxHeight: "300px", objectFit: "contain" }}
+                            onError={(e) => {
+                              e.currentTarget.src =
+                                "https://via.placeholder.com/300?text=Image+Not+Found";
+                              e.currentTarget.alt = "Image failed to load";
+                            }}
+                          />
+                        </div>
+                      )}
                       <div className="space-y-2">
                         {q.options.map((option, optIndex) => {
                           const optionLabel = String.fromCharCode(
@@ -322,6 +339,22 @@ const MockTestPage: React.FC = () => {
                   <p className="font-medium mb-2">
                     {index + 1}. {q.question}
                   </p>
+                  {/* Display image if available */}
+                  {q.img && (
+                    <div className="mb-4">
+                      <img
+                        src={q.img}
+                        alt="Question illustration"
+                        className="max-w-full h-auto rounded-md shadow-sm"
+                        style={{ maxHeight: "300px", objectFit: "contain" }}
+                        onError={(e) => {
+                          e.currentTarget.src =
+                            "https://via.placeholder.com/300?text=Image+Not+Found";
+                          e.currentTarget.alt = "Image failed to load";
+                        }}
+                      />
+                    </div>
+                  )}
                   {q.options.map((option, optIndex) => {
                     const optionLabel = String.fromCharCode(65 + optIndex); // A, B, C, D
                     return (
