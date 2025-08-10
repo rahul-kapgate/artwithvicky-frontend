@@ -1,5 +1,3 @@
-// Home.tsx
-
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -94,31 +92,28 @@ export default function Home() {
   };
 
   return (
-    <div className="w-full h-full text-gray-800 scroll-smooth">
+    <div className="min-h-screen bg-gradient-to-b from-purple-50 via-white to-white text-gray-800 scroll-smooth">
 
       {/* Hero */}
-      <section className="w-full min-h-screen bg-gradient-to-r from-purple-100 via-purple-50 to-purple-100 text-center py-20 px-4">
-  <div className="max-w-4xl mx-auto">
-    <h1 className=" text-8xl font-extrabold tracking-tight leading-tight mb-6 ">
-      Welcome to{" "}
-      <span className="bg-gradient-to-r from-purple-600 via-pink-500 to-yellow-500 bg-clip-text text-transparent font-serif italic drop-shadow-md">
-        Artistic Vicky
-      </span>
-    </h1>
-    <p className="text-xl text-gray-700 font-medium italic mb-8">
-      Discover colors, creativity, and inspiration through the eyes of Vicky.
-    </p>
-   <button type="button" className="button-86">
-  🎨 Explore Gallery
-</button>
-
-
-  </div>
-</section>
-
+      <section className="text-center py-20 px-4">
+        <div className="max-w-4xl mx-auto">
+          <h1 className="text-5xl font-bold mb-4">
+            Welcome to{" "}
+            <span className="bg-gradient-to-r from-purple-500 via-purple-600 to-purple-800 bg-clip-text text-transparent">
+              Artistic Vicky
+            </span>
+          </h1>
+          <p className="text-lg text-gray-600 mb-6">
+            Discover colors, creativity, and inspiration through the eyes of Vicky.
+          </p>
+          <a href="#gallery">
+            <Button className="text-lg px-6 py-4">Explore Gallery</Button>
+          </a>
+        </div>
+      </section>
 
       {/* Gallery */}
-      <section id="gallery" className="w-full min-h-screen bg-gradient-to-r from-purple-100 via-purple-50 to-purple-100 py-16 px-4">
+      <section id="gallery" className="py-16 bg-white px-4">
         <div className="max-w-6xl mx-auto">
           <h2 className="text-3xl font-semibold text-center mb-10">Featured Artworks</h2>
           <Swiper
@@ -164,7 +159,7 @@ export default function Home() {
       </section>
 
       {/* Courses */}
-      {/* <section id="courses" className="w-full min-h-screen bg-gradient-to-r from-purple-100 via-purple-50 to-purple-100 py-20 px-4">
+      <section id="courses" className="py-20 bg-white px-4">
         <div className="max-w-4xl mx-auto text-center">
           <h2 className="text-3xl font-semibold mb-4">Our Courses</h2>
           <p className="text-gray-700 text-lg mb-6">
@@ -177,69 +172,60 @@ export default function Home() {
             View Courses
           </Link>
         </div>
-      </section> */}
+      </section>
 
+      {/* Fancy About Us */}
       <section
-  id="courses"
-  className="relative w-full min-h-screen bg-gradient-to-r from-purple-100 via-white to-purple-100 py-20 px-4 overflow-hidden"
->
-  {/* Decorative blurred circles */}
-  <div className="absolute top-0 left-0 w-40 h-40 bg-purple-300 opacity-20 rounded-full blur-3xl animate-pulse"></div>
-  <div className="absolute bottom-10 right-0 w-60 h-60 bg-purple-400 opacity-20 rounded-full blur-3xl animate-pulse"></div>
-
-  <div className="max-w-5xl mx-auto text-center relative z-10">
-    <h2 className="text-4xl font-extrabold mb-4 text-gray-800">
-      <span className="text-purple-600">Ignite</span> Your Creativity
-    </h2>
-    <p className="text-gray-600 text-lg mb-10">
-      Learn from expert artists and explore your passion with our hand-picked art courses.
-    </p>
-
-    {/* Featured Courses */}
-    <div className="grid sm:grid-cols-1 md:grid-cols-2 gap-6 mb-10">
-      <div className="bg-white shadow-xl rounded-xl p-6 hover:scale-105 transition-transform duration-300 border">
-        <h3 className="text-xl font-semibold text-purple-700 mb-2">Watercolor Basics</h3>
-        <p className="text-gray-600">Perfect for beginners. Learn brush control, blending, and color theory.</p>
-      </div>
-      <div className="bg-white shadow-xl rounded-xl p-6 hover:scale-105 transition-transform duration-300 border">
-        <h3 className="text-xl font-semibold text-purple-700 mb-2">Portrait Drawing</h3>
-        <p className="text-gray-600">Master facial proportions, shading, and expressiveness in your sketches.</p>
-      </div>
-    </div>
-
-    {/* Call to Action Button */}
-    <Link to="/courses" className="button-86" role="button">
-  Explore All Courses
-</Link>
-
-  </div>
-</section>
-
-
-      {/* About Us */}
-      <section id="about" className="w-full min-h-screen bg-gradient-to-r from-purple-100 via-purple-50 to-purple-100 relative overflow-hidden py-20 px-6">
+        id="about"
+        className="py-20 px-6 bg-gradient-to-r from-purple-100 via-purple-50 to-purple-100 relative overflow-hidden"
+      >
+        {/* Decorative animated circles */}
         <div className="absolute -top-16 -left-16 w-48 h-48 bg-purple-300 rounded-full opacity-20 animate-pulse"></div>
         <div className="absolute -bottom-16 -right-16 w-48 h-48 bg-purple-400 rounded-full opacity-30 animate-pulse animation-delay-2000"></div>
 
         <div className="max-w-4xl mx-auto bg-white rounded-3xl shadow-xl p-12 relative z-10">
           <h2 className="text-4xl font-extrabold mb-6 flex items-center justify-center gap-3 text-purple-700">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-10 w-10 text-purple-600"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              strokeWidth={2}
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M12 8c-1.657 0-3 1.567-3 3.5S10.343 15 12 15s3-1.567 3-3.5S13.657 8 12 8z"
+              />
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M12 15v4m0 0H9m3 0h3"
+              />
+            </svg>
             About Us
           </h2>
+
           <p className="text-gray-700 text-lg mb-6 leading-relaxed tracking-wide">
             Art Inspiration & BFA Exam Success – Discover a world of artistic inspiration through captivating videos on drawing, painting, digital art, and more.
             Simultaneously, navigate your Bachelor of Fine Arts journey with our comprehensive exam guides, study strategies, and important updates.
             Join us now to fuel your creativity and conquer your BFA exams! <span className="inline-block text-purple-600 text-2xl">🏆</span>
           </p>
+
           <div className="flex justify-center">
-            <Badge variant="outline" className="text-purple-600 border-purple-500 text-sm font-semibold px-4 py-2 text-center">
+            <Badge
+              variant="outline"
+              className="text-purple-600 border-purple-500 text-sm font-semibold px-4 py-2 text-center"
+            >
               Based in India · Available for commissions
             </Badge>
           </div>
         </div>
       </section>
 
-      {/* Contact */}
-      <section id="contact" className="w-full min-h-screen bg-gradient-to-r from-purple-100 via-purple-50 to-purple-100 py-16 px-4">
+      {/* Contact Links Section */}
+      <section id="contact" className="py-16 px-4 bg-purple-50">
         <div className="max-w-6xl mx-auto">
           <h2 className="text-3xl font-semibold mb-6 text-center">Connect with Vicky</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
@@ -263,8 +249,8 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Products */}
-      <section id="links" className="w-full min-h-screen bg-gradient-to-r from-purple-100 via-purple-50 to-purple-100 py-16 px-4">
+      {/* Product Links Section */}
+      <section id="links" className="py-16 px-4 bg-white">
         <div className="max-w-6xl mx-auto">
           <h2 className="text-3xl font-semibold mb-6 text-center">Recommended Art Materials</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
@@ -283,7 +269,6 @@ export default function Home() {
           </div>
         </div>
       </section>
-
     </div>
   );
 }
