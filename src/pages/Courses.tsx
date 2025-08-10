@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 import AuthModal from "./AuthModal";
 import { useAuth } from "@/context/AuthContext";
 import { toast } from "react-toastify";
+import { Link } from "react-router-dom";
 
 const courses = [
   {
@@ -57,7 +58,8 @@ export default function Courses() {
       navigate(`/course/${slug}`);
     } else {
       // User is logged in but not authorized for this course
-      toast.error("You are not authorized to access this course.");
+      window.open("https://wa.me/9226221871", "_blank");
+
     }
   };
 
