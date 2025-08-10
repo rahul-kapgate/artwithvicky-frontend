@@ -23,6 +23,9 @@ const MockTestPage: React.FC = () => {
   const [showConfirm, setShowConfirm] = useState(false);
   const [showLeaveConfirm, setShowLeaveConfirm] = useState(false);
   const [showTabSwitchWarning, setShowTabSwitchWarning] = useState(false);
+  // 🚀 Added for 7-day rule
+  const [canTakeTest, setCanTakeTest] = useState(false);
+  const [nextAvailableDate, setNextAvailableDate] = useState<Date | null>(null);
 
   useEffect(() => {
     const fetchQuestions = async () => {
@@ -54,6 +57,67 @@ const MockTestPage: React.FC = () => {
   } else {
     console.log("No user found in localStorage");
   }
+  // 🚀 Updated for strict 7-day rule with UTC sorting
+  useEffect(() => {
+    const fetchProfileForTest = async () => {
+      if (!userId) {
+        setCanTakeTest(false);
+        return;
+      }
+      try {
+        const response = await fetch(
+          `https://artwithvicky-backend.onrender.com/api/users/profile/${userId}`
+        );
+        if (!response.ok) {
+          throw new Error("Failed to fetch profile");
+        }
+        const data = await response.json();
+        const mockTests = data.mockTests || [];
+        if (mockTests.length === 0) {
+          setCanTakeTest(true);
+          return;
+        }
+        // Sort mockTests by dateOfTest in descending order to ensure latest test
+        const sortedTests = mockTests.sort(
+          (a: { dateOfTest: string }, b: { dateOfTest: string }) =>
+            new Date(b.dateOfTest).getTime() - new Date(a.dateOfTest).getTime()
+        );
+        const lastTest = sortedTests[0];
+        const lastDate = new Date(lastTest.dateOfTest);
+        const nextDate = new Date(lastDate.getTime() + 7 * 24 * 60 * 60 * 1000);
+        setNextAvailableDate(nextDate);
+        const today = new Date();
+        // Normalize to UTC date-only for comparison
+        const todayUTC = new Date(
+          Date.UTC(
+            today.getUTCFullYear(),
+            today.getUTCMonth(),
+            today.getUTCDate()
+          )
+        );
+        // const lastDateUTC = new Date(
+        //   Date.UTC(
+        //     lastDate.getUTCFullYear(),
+        //     lastDate.getUTCMonth(),
+        //     lastDate.getUTCDate()
+        //   )
+        // );
+        const nextDateUTC = new Date(
+          Date.UTC(
+            nextDate.getUTCFullYear(),
+            nextDate.getUTCMonth(),
+            nextDate.getUTCDate()
+          )
+        );
+        // Allow test only if today is at least 7 days after last test and not on the same day
+        setCanTakeTest(todayUTC >= nextDateUTC);
+      } catch (err) {
+        console.error(err);
+        setCanTakeTest(false);
+      }
+    };
+    fetchProfileForTest();
+  }, []);
 
   useEffect(() => {
     let timer: NodeJS.Timeout;
@@ -209,12 +273,37 @@ const MockTestPage: React.FC = () => {
                   Welcome to the Mock Test! You will have 1 hour to complete the
                   test. Click the button below to start.
                 </p>
-                <Button
-                  className="bg-purple-600 hover:bg-purple-700 text-white px-6 py-2"
-                  onClick={() => setTestStarted(true)}
-                >
-                  Start Test
-                </Button>
+                {/* // 🚀 Added for 7-day rule */}
+                {!canTakeTest && nextAvailableDate && (
+                  <p className="text-lg text-red-600 mb-6">
+                    ❌ You can only take one mock test per week. Next available
+                    on{" "}
+                    {nextAvailableDate
+                      ? new Date(nextAvailableDate)
+                          .toLocaleDateString("en-GB", {
+                            day: "2-digit",
+                            month: "2-digit",
+                            year: "numeric",
+                          })
+                          .replace(/\//g, "-")
+                      : ""}
+                  </p>
+                )}
+                {canTakeTest ? (
+                  <Button
+                    className="bg-purple-600 hover:bg-purple-700 text-white px-6 py-2"
+                    onClick={() => setTestStarted(true)}
+                  >
+                    Start Test
+                  </Button>
+                ) : (
+                  <Button
+                    disabled
+                    className="bg-purple-600 hover:bg-purple-700 text-white px-6 py-2"
+                  >
+                    Start Test
+                  </Button>
+                )}
               </CardContent>
             </Card>
           </div>
