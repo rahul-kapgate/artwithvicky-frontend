@@ -5,7 +5,6 @@ import { useNavigate } from "react-router-dom";
 import AuthModal from "./AuthModal";
 import { useAuth } from "@/context/AuthContext";
 import { toast } from "react-toastify";
-import { Link } from "react-router-dom";
 
 const courses = [
   {
