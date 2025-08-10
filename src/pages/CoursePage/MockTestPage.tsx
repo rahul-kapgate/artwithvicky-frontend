@@ -95,13 +95,13 @@ const MockTestPage: React.FC = () => {
             today.getUTCDate()
           )
         );
-        const lastDateUTC = new Date(
-          Date.UTC(
-            lastDate.getUTCFullYear(),
-            lastDate.getUTCMonth(),
-            lastDate.getUTCDate()
-          )
-        );
+        // const lastDateUTC = new Date(
+        //   Date.UTC(
+        //     lastDate.getUTCFullYear(),
+        //     lastDate.getUTCMonth(),
+        //     lastDate.getUTCDate()
+        //   )
+        // );
         const nextDateUTC = new Date(
           Date.UTC(
             nextDate.getUTCFullYear(),
