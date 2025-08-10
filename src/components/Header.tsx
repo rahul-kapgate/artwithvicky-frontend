@@ -91,7 +91,7 @@ export default function Header() {
                   onClick={() => navigate("/profile")}
                   className="w-8 h-8 rounded-full bg-gradient-to-r from-purple-500 via-purple-600 to-purple-800 text-white flex items-center justify-center font-bold text-lg cursor-pointer"
                 >
-                  {/* {user.fullName.charAt(0).toUpperCase()} */}
+                  {user.fullName.charAt(0).toUpperCase()}
                 </div>
                 {/* Admin Panel Link - Only visible to admins */}
                 {isAdmin() && (
@@ -126,8 +126,11 @@ export default function Header() {
           <div className="flex items-center space-x-2 md:hidden">
             {user ? (
               <>
-                <div className="w-8 h-8 rounded-full bg-purple-600 text-white flex items-center justify-center font-bold text-lg">
-                  {/* {user.fullName.charAt(0).toUpperCase()} */}
+                <div
+                  onClick={() => navigate("/profile")}
+                  className="w-8 h-8 rounded-full bg-purple-600 text-white flex items-center justify-center font-bold text-lg"
+                >
+                  {user.fullName.charAt(0).toUpperCase()}
                 </div>
                 {/* Admin Panel Link for Mobile - Only visible to admins */}
                 {isAdmin() && (
