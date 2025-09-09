@@ -33,7 +33,7 @@ const contactLinks = [
   },
   {
     label: "WhatsApp Group",
-    url: "https://chat.whatsapp.com/LYEPtRmEj9L2CbbOZCaERz",
+    url: "https://chat.whatsapp.com/KYAuVuPVR8xJ8eXbTLvDl3",
     icon: "👥",
   },
   {
