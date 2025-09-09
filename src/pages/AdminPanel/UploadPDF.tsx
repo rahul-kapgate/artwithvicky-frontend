@@ -7,57 +7,39 @@ import { toast } from "react-toastify";
 interface Resource {
   _id: string;
   title: string;
-  fileType: string;
-  courseId: { _id: string };
-  cloudinaryUrl: string;
-  cloudinaryPublicId: string;
-  uploadedAt: string;
-}
-
-interface Course {
-  _id: string;
-  title: string;
   description: string;
-}
-
-interface Pagination {
-  currentPage: number;
-  totalPages: number;
-  totalResources: number;
-  hasNextPage: boolean;
-  hasPrevPage: boolean;
+  type: string;
+  link: string;
+  createdAt: string;
 }
 
 function PDFUpload() {
   const [resources, setResources] = useState<Resource[]>([]);
-  const [pagination, setPagination] = useState<Pagination | null>(null);
   const [loading, setLoading] = useState(true);
   const [editingResource, setEditingResource] = useState<Resource | null>(null);
   const [updatedTitle, setUpdatedTitle] = useState("");
   const [updatedDescription, setUpdatedDescription] = useState("");
-  const [currentPage, setCurrentPage] = useState(1);
+  const [updatedType, setUpdatedType] = useState("");
+  const [updatedLink, setUpdatedLink] = useState("");
 
   // Upload form states
   const [title, setTitle] = useState("");
-  const [fileType, setFileType] = useState("pyq");
-  const [courseId, setCourseId] = useState("");
-  const [courses, setCourses] = useState<Course[]>([]);
-  const [loadingCourses, setLoadingCourses] = useState(true);
-  const [file, setFile] = useState<File | null>(null);
+  const [description, setDescription] = useState("");
+  const [type, setType] = useState("pyq");
+  const [link, setLink] = useState("");
   const [uploading, setUploading] = useState(false);
 
-  // Fetch resources and courses on component mount
+  // Fetch resources on component mount
   useEffect(() => {
-    fetchResources(currentPage);
-    fetchCourses();
-  }, [currentPage]);
+    fetchResources();
+  }, []);
 
-  const fetchResources = async (page: number) => {
+  const fetchResources = async () => {
     try {
       setLoading(true);
       const token = localStorage.getItem("accessToken");
       const response = await fetch(
-        `https://artwithvicky-backend.onrender.com/api/admin/resources?page=${page}`,
+        `https://artwithvicky-backend.onrender.com/api/resources/get-all`,
         {
           method: "GET",
           headers: {
@@ -72,8 +54,7 @@ function PDFUpload() {
         throw new Error(result.message || "Failed to fetch resources");
       }
 
-      setResources(result.data.resources);
-      setPagination(result.data.pagination);
+      setResources(result.resources);
     } catch (error: any) {
       toast.error(
         "Failed to load resources: " + (error.message || "Unknown error")
@@ -83,50 +64,16 @@ function PDFUpload() {
     }
   };
 
-  const fetchCourses = async () => {
-    try {
-      setLoadingCourses(true);
-
-      // For demo purposes, using sample data. Replace with actual API call:
-      // const token = localStorage.getItem("accessToken");
-      // const response = await fetch("https://artwithvicky-backend.onrender.com/api/courses", {
-      //   method: "GET",
-      //   headers: {
-      //     Authorization: `Bearer ${token}`,
-      //     "Content-Type": "application/json",
-      //   },
-      // });
-
-      // Simulating API call with sample data
-      setTimeout(() => {
-        setCourses([
-          {
-            _id: "6848338d4ef958e38643f3c3",
-            title: "MAH AAC CET Entrance Exam Preparation",
-            description:
-              "Comprehensive preparation course for the Maharashtra Applied Arts and Crafts Common Entrance Test (AAC CET).",
-          },
-        ]);
-        setLoadingCourses(false);
-      }, 1000);
-    } catch (error: any) {
-      toast.error(
-        "Failed to load courses: " + (error.message || "Unknown error")
-      );
-      setLoadingCourses(false);
-    }
-  };
-
   const handleUpdate = async (resourceId: string) => {
-    if (!updatedTitle) {
-      toast.error("Title is required");
+    if (!updatedTitle || !updatedType || !updatedLink) {
+      toast.error("Title, type, and link are required");
       return;
     }
 
     try {
       const token = localStorage.getItem("accessToken");
       const response = await fetch(
-        `https://artwithvicky-backend.onrender.com/api/admin/resources/${resourceId}`,
+        `https://artwithvicky-backend.onrender.com/api/resources/update-by-id/${resourceId}`,
         {
           method: "PUT",
           headers: {
@@ -136,6 +83,8 @@ function PDFUpload() {
           body: JSON.stringify({
             title: updatedTitle,
             description: updatedDescription,
+            type: updatedType,
+            link: updatedLink,
           }),
         }
       );
@@ -149,7 +98,9 @@ function PDFUpload() {
       setEditingResource(null);
       setUpdatedTitle("");
       setUpdatedDescription("");
-      fetchResources(currentPage);
+      setUpdatedType("");
+      setUpdatedLink("");
+      fetchResources();
     } catch (error: any) {
       toast.error(error.message || "Update failed");
     }
@@ -163,7 +114,7 @@ function PDFUpload() {
     try {
       const token = localStorage.getItem("accessToken");
       const response = await fetch(
-        `https://artwithvicky-backend.onrender.com/api/admin/resources/${resourceId}`,
+        `https://artwithvicky-backend.onrender.com/api/resources/delete-by-id/${resourceId}`,
         {
           method: "DELETE",
           headers: {
@@ -179,7 +130,7 @@ function PDFUpload() {
       }
 
       toast.success("Resource deleted successfully");
-      fetchResources(currentPage);
+      fetchResources();
     } catch (error: any) {
       toast.error(error.message || "Deletion failed");
     }
@@ -188,28 +139,23 @@ function PDFUpload() {
   const handleUpload = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!file || !title || !fileType || !courseId) {
-      toast.error("All fields are required");
+    if (!title || !type || !link) {
+      toast.error("Title, type, and link are required");
       return;
     }
-
-    const formData = new FormData();
-    formData.append("file", file);
-    formData.append("title", title);
-    formData.append("fileType", fileType);
-    formData.append("courseId", courseId);
 
     try {
       setUploading(true);
       const token = localStorage.getItem("accessToken");
       const response = await fetch(
-        "https://artwithvicky-backend.onrender.com/api/admin/upload",
+        "https://artwithvicky-backend.onrender.com/api/resources/create",
         {
           method: "POST",
           headers: {
             Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
           },
-          body: formData,
+          body: JSON.stringify({ title, description, type, link }),
         }
       );
 
@@ -218,14 +164,12 @@ function PDFUpload() {
         throw new Error(result.message || "Upload failed");
       }
 
-      toast.success("PDF uploaded successfully");
+      toast.success("Resource created successfully");
       setTitle("");
-      setCourseId("");
-      setFile(null);
-      setFileType("pyq");
-      const input = document.getElementById("fileInput") as HTMLInputElement;
-      if (input) input.value = "";
-      fetchResources(currentPage);
+      setDescription("");
+      setType("pyq");
+      setLink("");
+      fetchResources();
     } catch (error: any) {
       toast.error(error.message || "Upload failed");
     } finally {
@@ -236,13 +180,17 @@ function PDFUpload() {
   const startEditing = (resource: Resource) => {
     setEditingResource(resource);
     setUpdatedTitle(resource.title);
-    setUpdatedDescription("");
+    setUpdatedDescription(resource.description || "");
+    setUpdatedType(resource.type);
+    setUpdatedLink(resource.link);
   };
 
   const cancelEditing = () => {
     setEditingResource(null);
     setUpdatedTitle("");
     setUpdatedDescription("");
+    setUpdatedType("");
+    setUpdatedLink("");
   };
 
   return (
@@ -253,24 +201,34 @@ function PDFUpload() {
 
       {/* Upload Form */}
       <div className="mb-10 border p-6 rounded">
-        <h3 className="text-xl font-semibold mb-4">📄 Upload PDF</h3>
+        <h3 className="text-xl font-semibold mb-4">📄 Create Resource</h3>
         <div className="space-y-5">
           <div>
             <Label>Title</Label>
             <Input
               type="text"
-              placeholder="Enter PDF Name"
+              placeholder="Enter Resource Title"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
             />
           </div>
 
           <div>
-            <Label>File Type</Label>
+            <Label>Description</Label>
+            <Input
+              type="text"
+              placeholder="Enter Resource Description"
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+            />
+          </div>
+
+          <div>
+            <Label>Type</Label>
             <select
               className="w-full border px-3 py-2 rounded text-sm"
-              value={fileType}
-              onChange={(e) => setFileType(e.target.value)}
+              value={type}
+              onChange={(e) => setType(e.target.value)}
             >
               <option value="notes">Notes</option>
               <option value="ebook">eBook</option>
@@ -280,43 +238,21 @@ function PDFUpload() {
           </div>
 
           <div>
-            <Label>Course</Label>
-            {loadingCourses ? (
-              <div className="w-full border px-3 py-2 rounded text-sm text-gray-500">
-                Loading courses...
-              </div>
-            ) : (
-              <select
-                className="w-full border px-3 py-2 rounded text-sm"
-                value={courseId}
-                onChange={(e) => setCourseId(e.target.value)}
-              >
-                <option value="">Select a course</option>
-                {courses.map((course) => (
-                  <option key={course._id} value={course._id}>
-                    {course.title}
-                  </option>
-                ))}
-              </select>
-            )}
-          </div>
-
-          <div>
-            <Label>PDF File</Label>
+            <Label>Link</Label>
             <Input
-              id="fileInput"
-              type="file"
-              accept=".pdf"
-              onChange={(e) => setFile(e.target.files?.[0] || null)}
+              type="text"
+              placeholder="Enter Google Drive Link"
+              value={link}
+              onChange={(e) => setLink(e.target.value)}
             />
           </div>
 
           <Button
             onClick={handleUpload}
             className="w-full bg-purple-600 hover:bg-purple-700 text-white"
-            disabled={uploading || loadingCourses}
+            disabled={uploading}
           >
-            {uploading ? "Uploading..." : "Upload PDF"}
+            {uploading ? "Creating..." : "Create Resource"}
           </Button>
         </div>
       </div>
@@ -325,105 +261,105 @@ function PDFUpload() {
       {loading ? (
         <div className="text-center">Loading resources...</div>
       ) : (
-        <>
-          <div className="space-y-4">
-            {resources.map((resource) => (
-              <div
-                key={resource._id}
-                className="border p-4 rounded flex justify-between items-center"
-              >
-                {editingResource?._id === resource._id ? (
-                  <div className="w-full">
-                    <div className="mb-2">
-                      <Label>Title</Label>
-                      <Input
-                        type="text"
-                        value={updatedTitle}
-                        onChange={(e) => setUpdatedTitle(e.target.value)}
-                      />
-                    </div>
-                    <div className="mb-2">
-                      <Label>Description</Label>
-                      <Input
-                        type="text"
-                        value={updatedDescription}
-                        onChange={(e) => setUpdatedDescription(e.target.value)}
-                      />
-                    </div>
-                    <div className="flex space-x-2">
-                      <Button
-                        onClick={() => handleUpdate(resource._id)}
-                        className="bg-green-600 hover:bg-green-700 text-white"
-                      >
-                        Save
-                      </Button>
-                      <Button
-                        onClick={cancelEditing}
-                        className="bg-gray-600 hover:bg-gray-700 text-white"
-                      >
-                        Cancel
-                      </Button>
-                    </div>
+        <div className="space-y-4">
+          {resources.map((resource) => (
+            <div
+              key={resource._id}
+              className="border p-4 rounded flex justify-between items-center"
+            >
+              {editingResource?._id === resource._id ? (
+                <div className="w-full">
+                  <div className="mb-2">
+                    <Label>Title</Label>
+                    <Input
+                      type="text"
+                      value={updatedTitle}
+                      onChange={(e) => setUpdatedTitle(e.target.value)}
+                    />
                   </div>
-                ) : (
-                  <>
-                    <div>
-                      <h3 className="font-semibold">{resource.title}</h3>
-                      <p className="text-sm text-gray-600">
-                        Type: {resource.fileType} | Uploaded:{" "}
-                        {new Date(resource.uploadedAt).toLocaleDateString()}
-                      </p>
-                      <a
-                        href={resource.cloudinaryUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-blue-600 hover:underline"
-                      >
-                        View PDF
-                      </a>
-                    </div>
-                    <div className="space-x-2">
-                      <Button
-                        onClick={() => startEditing(resource)}
-                        className="bg-blue-600 hover:bg-blue-700 text-white"
-                      >
-                        Edit
-                      </Button>
-                      <Button
-                        onClick={() => handleDelete(resource._id)}
-                        className="bg-red-600 hover:bg-red-700 text-white"
-                      >
-                        Delete
-                      </Button>
-                    </div>
-                  </>
-                )}
-              </div>
-            ))}
-          </div>
-
-          {pagination && (
-            <div className="flex justify-between mt-6">
-              <Button
-                onClick={() => setCurrentPage(currentPage - 1)}
-                disabled={!pagination.hasPrevPage}
-                className="bg-gray-600 hover:bg-gray-700 text-white"
-              >
-                Previous
-              </Button>
-              <span>
-                Page {pagination.currentPage} of {pagination.totalPages}
-              </span>
-              <Button
-                onClick={() => setCurrentPage(currentPage + 1)}
-                disabled={!pagination.hasNextPage}
-                className="bg-gray-600 hover:bg-gray-700 text-white"
-              >
-                Next
-              </Button>
+                  <div className="mb-2">
+                    <Label>Description</Label>
+                    <Input
+                      type="text"
+                      value={updatedDescription}
+                      onChange={(e) => setUpdatedDescription(e.target.value)}
+                    />
+                  </div>
+                  <div className="mb-2">
+                    <Label>Type</Label>
+                    <select
+                      className="w-full border px-3 py-2 rounded text-sm"
+                      value={updatedType}
+                      onChange={(e) => setUpdatedType(e.target.value)}
+                    >
+                      <option value="notes">Notes</option>
+                      <option value="ebook">eBook</option>
+                      <option value="pyq">PYQ</option>
+                      <option value="session">Session</option>
+                    </select>
+                  </div>
+                  <div className="mb-2">
+                    <Label>Link</Label>
+                    <Input
+                      type="text"
+                      value={updatedLink}
+                      onChange={(e) => setUpdatedLink(e.target.value)}
+                    />
+                  </div>
+                  <div className="flex space-x-2">
+                    <Button
+                      onClick={() => handleUpdate(resource._id)}
+                      className="bg-green-600 hover:bg-green-700 text-white"
+                    >
+                      Save
+                    </Button>
+                    <Button
+                      onClick={cancelEditing}
+                      className="bg-gray-600 hover:bg-gray-700 text-white"
+                    >
+                      Cancel
+                    </Button>
+                  </div>
+                </div>
+              ) : (
+                <>
+                  <div>
+                    <h3 className="font-semibold">{resource.title}</h3>
+                    <p className="text-sm text-gray-600">
+                      {resource.description}
+                    </p>
+                    <p className="text-sm text-gray-600">
+                      Type: {resource.type} | Uploaded:{" "}
+                      {new Date(resource.createdAt).toLocaleDateString()}
+                    </p>
+                    <a
+                      href={resource.link}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-blue-600 hover:underline"
+                    >
+                      View Resource
+                    </a>
+                  </div>
+                  <div className="space-x-2">
+                    <Button
+                      onClick={() => startEditing(resource)}
+                      className="bg-blue-600 hover:bg-blue-700 text-white"
+                    >
+                      Edit
+                    </Button>
+                    <Button
+                      onClick={() => handleDelete(resource._id)}
+                      className="bg-red-600 hover:bg-red-700 text-white"
+                    >
+                      Delete
+                    </Button>
+                  </div>
+                </>
+              )}
             </div>
-          )}
-        </>
+          ))}
+        </div>
       )}
     </div>
   );

@@ -4,9 +4,10 @@ import { AlertCircle, Download } from "lucide-react";
 interface Resource {
   _id: string;
   title: string;
-  fileType: string;
-  cloudinaryUrl: string;
-  uploadedAt: string;
+  description: string;
+  type: string;
+  link: string;
+  createdAt: string;
 }
 
 function ResourcePage() {
@@ -29,7 +30,7 @@ function ResourcePage() {
       }
 
       const response = await fetch(
-        "https://artwithvicky-backend.onrender.com/api/admin/resources",
+        "https://artwithvicky-backend.onrender.com/api/resources/get-all",
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -43,10 +44,10 @@ function ResourcePage() {
       }
 
       const data = await response.json();
-      if (!data?.data?.resources) {
+      if (!data?.resources) {
         throw new Error("Unexpected response format");
       }
-      setResources(data.data.resources);
+      setResources(data.resources);
     } catch (err) {
       setError(
         err instanceof Error ? err.message : "Failed to fetch resources"
@@ -58,10 +59,26 @@ function ResourcePage() {
 
   const handleDownload = async (url: string, filename: string) => {
     try {
-      const response = await fetch(url, { method: "GET" });
+      // Extract file ID from Google Drive view URL
+      const fileIdMatch = url.match(/\/d\/(.+?)\/view/);
+      if (!fileIdMatch) {
+        throw new Error("Invalid Google Drive URL");
+      }
+      const fileId = fileIdMatch[1];
+      const downloadUrl = `https://drive.google.com/uc?id=${fileId}&export=download`;
+
+      const response = await fetch(downloadUrl, { method: "GET" });
       if (!response.ok) {
         throw new Error("Failed to fetch file");
       }
+
+      const contentType = response.headers.get("Content-Type");
+      if (contentType && contentType.includes("text/html")) {
+        // If HTML (likely virus scan warning), open in new tab
+        window.open(downloadUrl, "_blank");
+        return;
+      }
+
       const blob = await response.blob();
       const blobUrl = window.URL.createObjectURL(blob);
       const link = document.createElement("a");
@@ -73,6 +90,7 @@ function ResourcePage() {
       window.URL.revokeObjectURL(blobUrl);
     } catch (err) {
       console.error("Download error:", err);
+      // Fallback to opening the original URL
       window.open(url, "_blank");
     }
   };
@@ -96,15 +114,15 @@ function ResourcePage() {
     );
   }
 
-  // Group resources by fileType
+  // Group resources by type
   const groupedResources = {
-    notes: resources.filter((r) => r.fileType.toLowerCase() === "notes"),
-    pyq: resources.filter((r) => r.fileType.toLowerCase() === "pyq"),
-    ebook: resources.filter((r) => r.fileType.toLowerCase() === "ebook"),
-    session: resources.filter((r) => r.fileType.toLowerCase() === "session"),
+    notes: resources.filter((r) => r.type.toLowerCase() === "notes"),
+    pyq: resources.filter((r) => r.type.toLowerCase() === "pyq"),
+    ebook: resources.filter((r) => r.type.toLowerCase() === "ebook"),
+    session: resources.filter((r) => r.type.toLowerCase() === "session"),
     others: resources.filter(
       (r) =>
-        !["notes", "pyq", "ebook", "session"].includes(r.fileType.toLowerCase())
+        !["notes", "pyq", "ebook", "session"].includes(r.type.toLowerCase())
     ),
   };
 
@@ -124,7 +142,7 @@ function ResourcePage() {
                 <button
                   onClick={() =>
                     handleDownload(
-                      resource.cloudinaryUrl,
+                      resource.link,
                       `${resource.title}.pdf`
                     )
                   }
@@ -133,14 +151,17 @@ function ResourcePage() {
                   {resource.title}
                 </button>
                 <p className="text-sm text-gray-600">
-                  Type: {resource.fileType} | Uploaded:{" "}
-                  {new Date(resource.uploadedAt).toLocaleDateString()}
+                  {resource.description}
+                </p>
+                <p className="text-sm text-gray-600">
+                  Type: {resource.type} | Uploaded:{" "}
+                  {new Date(resource.createdAt).toLocaleDateString()}
                 </p>
               </div>
               <button
                 onClick={() =>
                   handleDownload(
-                    resource.cloudinaryUrl,
+                    resource.link,
                     `${resource.title}.pdf`
                   )
                 }
