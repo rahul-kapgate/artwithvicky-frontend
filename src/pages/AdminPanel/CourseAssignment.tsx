@@ -15,6 +15,11 @@ interface User {
   authorizedCourses: Course[];
 }
 
+const COURSE_LIST = [
+  { _id: "6848338d4ef958e38643f3c3", title: "Full Course" },
+  { _id: "68c1990bb8e0f3986be6abfb", title: "Mock Test" },
+];
+
 const CourseAssignment: React.FC = () => {
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
@@ -38,7 +43,7 @@ const CourseAssignment: React.FC = () => {
     }
   };
 
-  const assignCourse = async (userId: string, courseId: string) => {
+  const assignCourse = async (userId: string, course: Course) => {
     try {
       await fetchWithAuth(
         "https://artwithvicky-backend.onrender.com/api/admin/assign-courses",
@@ -46,7 +51,7 @@ const CourseAssignment: React.FC = () => {
           method: "POST",
           body: JSON.stringify({
             userId,
-            courseIds: [courseId],
+            courseIds: [course._id],
           }),
         }
       );
@@ -56,10 +61,7 @@ const CourseAssignment: React.FC = () => {
           user._id === userId
             ? {
                 ...user,
-                authorizedCourses: [
-                  ...user.authorizedCourses,
-                  { _id: courseId, title: `Course ${courseId}` },
-                ],
+                authorizedCourses: [...user.authorizedCourses, course],
               }
             : user
         )
@@ -147,15 +149,7 @@ const CourseAssignment: React.FC = () => {
                 {user.authorizedCourses.length > 0 ? (
                   <ul className="list-disc list-inside space-y-1">
                     {user.authorizedCourses.map((course) => (
-                      <li key={course._id} className="flex justify-between">
-                        <span>{course.title}</span>
-                        <button
-                          onClick={() => removeCourse(user._id, course._id)}
-                          className="ml-4 text-red-500 text-xs hover:underline"
-                        >
-                          Remove
-                        </button>
-                      </li>
+                      <li key={course._id}>{course.title}</li>
                     ))}
                   </ul>
                 ) : (
@@ -163,14 +157,34 @@ const CourseAssignment: React.FC = () => {
                 )}
               </td>
               <td className="px-4 py-3 text-center">
-                <Button
-                  onClick={() =>
-                    assignCourse(user._id, "6848338d4ef958e38643f3c3")
-                  }
-                  className="bg-purple-600 hover:bg-purple-700 text-white text-xs"
-                >
-                  Assign Default Course
-                </Button>
+                <div className="flex flex-col space-y-2">
+                  {COURSE_LIST.map((course) => {
+                    const isAssigned = user.authorizedCourses.some(
+                      (c) => c._id === course._id
+                    );
+
+                    return isAssigned ? (
+                      <Button
+                        key={course._id}
+                        variant="destructive"
+                        size="sm"
+                        onClick={() => removeCourse(user._id, course._id)}
+                        className="w-36"
+                      >
+                        Remove {course.title}
+                      </Button>
+                    ) : (
+                      <Button
+                        key={course._id}
+                        size="sm"
+                        onClick={() => assignCourse(user._id, course)}
+                        className="w-36 bg-purple-600 hover:bg-purple-700 text-white"
+                      >
+                        Assign {course.title}
+                      </Button>
+                    );
+                  })}
+                </div>
               </td>
             </tr>
           ))}
