@@ -14,8 +14,8 @@ const courses = [
       "Get fully prepared for the MAH AAC CET exam with expert-led training. This course covers key areas like Object Drawing, 2D Design, Memory Drawing, and General Knowledge (GK), with full access to premium study resources.",
     duration: "6 Weeks",
     level: "Advanced",
-    originalPrice: 7999,
-    discountedPrice: 4999,
+    originalPrice: 9999,
+    discountedPrice: 5999,
     modules: [
       "Object Drawing",
       "2D Designs",
