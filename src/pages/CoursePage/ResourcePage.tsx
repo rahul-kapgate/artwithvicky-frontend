@@ -57,43 +57,31 @@ function ResourcePage() {
     }
   };
 
-  const handleDownload = async (url: string, filename: string) => {
+  const handleDownload = (url: string, filename: string) => {
     try {
-      // Extract file ID from Google Drive view URL
+      let downloadUrl = url;
+
+      // Convert Google Drive "view" URL to direct download
       const fileIdMatch = url.match(/\/d\/(.+?)\/view/);
-      if (!fileIdMatch) {
-        throw new Error("Invalid Google Drive URL");
-      }
-      const fileId = fileIdMatch[1];
-      const downloadUrl = `https://drive.google.com/uc?id=${fileId}&export=download`;
-
-      const response = await fetch(downloadUrl, { method: "GET" });
-      if (!response.ok) {
-        throw new Error("Failed to fetch file");
+      if (fileIdMatch) {
+        const fileId = fileIdMatch[1];
+        downloadUrl = `https://drive.google.com/uc?export=download&id=${fileId}`;
       }
 
-      const contentType = response.headers.get("Content-Type");
-      if (contentType && contentType.includes("text/html")) {
-        // If HTML (likely virus scan warning), open in new tab
-        window.open(downloadUrl, "_blank");
-        return;
-      }
-
-      const blob = await response.blob();
-      const blobUrl = window.URL.createObjectURL(blob);
+      // Create a temporary <a> tag and click it
       const link = document.createElement("a");
-      link.href = blobUrl;
-      link.download = filename;
+      link.href = downloadUrl;
+      link.download = filename; // browser may ignore for Drive links, still better
+      link.target = "_blank"; // prevents navigating away
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
-      window.URL.revokeObjectURL(blobUrl);
     } catch (err) {
       console.error("Download error:", err);
-      // Fallback to opening the original URL
-      window.open(url, "_blank");
+      alert("Download failed. Please try again.");
     }
   };
+
 
   if (loading) {
     return (
