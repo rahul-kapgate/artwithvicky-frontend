@@ -1,5 +1,6 @@
 import { Card, CardContent } from "@/components/ui/card";
-import { Link } from "react-router-dom";
+import { Button } from "@/components/ui/button";
+import { useNavigate } from "react-router-dom";
 import { Swiper, SwiperSlide } from "swiper/react";
 //@ts-ignore
 import "swiper/css";
@@ -9,6 +10,9 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import { Autoplay } from "swiper/modules";
 import { Palette, Heart, Globe, Star, Layers, Brush } from "lucide-react";
+import { useAuth } from "@/context/AuthContext";
+import { toast } from "react-toastify";
+import AuthModal from "./AuthModal";
 
 // ---------- Interfaces ----------
 interface Artwork {
@@ -54,30 +58,7 @@ const contactLinks = [
   },
 ];
 
-// ---------- Recommended Products ----------
-// const productLinks = [
-//   { label: "Stadler Graphite Pencils", url: "https://amzn.to/45uKJ2E" },
-//   { label: "Kneaded Eraser", url: "https://amzn.to/4eeJGWY" },
-//   { label: "Camel Artist Watercolor Tube Set", url: "https://amzn.to/404SyJ1" },
-//   { label: "Colour Mixing Pallet", url: "https://amzn.to/4ndwKVb" },
-//   { label: "Camel Brush Set", url: "https://amzn.to/4lbBCbG" },
-//   { label: "Poster Colours", url: "https://amzn.to/44nZH9D" },
-//   { label: "Mono Zero Eraser", url: "https://amzn.to/4l2cSTB" },
-//   { label: "White Gelly Roll Pen", url: "https://amzn.to/40ddSvI" },
-//   { label: "Electric Eraser", url: "https://amzn.to/3GakBQc" },
-//   { label: "Brustro Artist Drawing Paper", url: "https://amzn.to/3G6SxgK" },
-//   { label: "Brustro Drawing Paper 200gsm", url: "https://amzn.to/4kQjsMK" },
-//   { label: "Camelin Charcoal Pencils", url: "https://amzn.to/3ZGH2Dp" },
-//   { label: "Sand Paper", url: "https://amzn.to/45vKAMt" },
-//   { label: "Charcoal Powder", url: "https://amzn.to/3HTGd3Z" },
-//   { label: "Pencil Extender", url: "https://amzn.to/44aOt8x" },
-//   { label: "Fixative Spray", url: "https://amzn.to/4lzl0uO" },
-//   { label: "Think 3d Book", url: "https://amzn.to/3Tdqv6f" },
-//   { label: "A3 Drawing Book", url: "https://amzn.to/3I4YPhC" },
-//   { label: "Pen Tab & Laptop", url: "https://amzn.to/3TzrDkF" },
-// ];
-
-
+// ---------- Courses ----------
 const courses = [
   {
     _id: "6848338d4ef958e38643f3c3",
@@ -114,42 +95,54 @@ const courses = [
   },
 ];
 
-  const reasons = [
-    {
-      icon: <Star className="w-8 h-8 text-pink-500" />,
-      title: "Unique Creativity",
-      desc: "Every artwork is crafted with originality, blending modern techniques with timeless styles.",
-    },
-    {
-      icon: <Heart className="w-8 h-8 text-red-500" />,
-      title: "Personal Expression",
-      desc: "Art that speaks emotions, stories, and imagination beyond words.",
-    },
-    {
-      icon: <Layers className="w-8 h-8 text-indigo-500" />,
-      title: "Diverse Portfolio",
-      desc: "From digital illustrations to traditional paintings, explore a wide range of creative expressions.",
-    },
-    {
-      icon: <Brush className="w-8 h-8 text-green-500" />,
-      title: "Custom Creations",
-      desc: "Personalized artworks designed to reflect your vision, style, or brand.",
-    },
-    {
-      icon: <Palette className="w-8 h-8 text-yellow-500" />,
-      title: "Passion for Art",
-      desc: "Driven by love for creativity, each piece is made with dedication and detail.",
-    },
-    {
-      icon: <Globe className="w-8 h-8 text-blue-500" />,
-      title: "Global Reach",
-      desc: "Connect with art lovers worldwide through exhibitions and digital platforms.",
-    },
-  ];
+// ---------- Reasons Section ----------
+const reasons = [
+  {
+    icon: <Star className="w-8 h-8 text-pink-500" />,
+    title: "Unique Creativity",
+    desc: "Every artwork is crafted with originality, blending modern techniques with timeless styles.",
+  },
+  {
+    icon: <Heart className="w-8 h-8 text-red-500" />,
+    title: "Personal Expression",
+    desc: "Art that speaks emotions, stories, and imagination beyond words.",
+  },
+  {
+    icon: <Layers className="w-8 h-8 text-indigo-500" />,
+    title: "Diverse Portfolio",
+    desc: "From digital illustrations to traditional paintings, explore a wide range of creative expressions.",
+  },
+  {
+    icon: <Brush className="w-8 h-8 text-green-500" />,
+    title: "Custom Creations",
+    desc: "Personalized artworks designed to reflect your vision, style, or brand.",
+  },
+  {
+    icon: <Palette className="w-8 h-8 text-yellow-500" />,
+    title: "Passion for Art",
+    desc: "Driven by love for creativity, each piece is made with dedication and detail.",
+  },
+  {
+    icon: <Globe className="w-8 h-8 text-blue-500" />,
+    title: "Global Reach",
+    desc: "Connect with art lovers worldwide through exhibitions and digital platforms.",
+  },
+];
+
+// ---------- Helper ----------
+const createSlug = (title: string) =>
+  title
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
 
 // ---------- Main Component ----------
 export default function Home() {
   const [artworks, setArtworks] = useState<Artwork[]>([]);
+  const { user } = useAuth();
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const [authMode, setAuthMode] = useState<"login" | "signup" | "forgotPassword">("login");
+  const navigate = useNavigate();
 
   // Fetch images from backend API
   useEffect(() => {
@@ -164,6 +157,20 @@ export default function Home() {
       setArtworks(response.data.data);
     } catch (error) {
       console.error("Error fetching artworks:", error);
+    }
+  };
+
+  // Handle course enroll
+  const handleEnrollClick = (courseId: string, courseTitle: string) => {
+    if (!user) {
+      setIsAuthModalOpen(true);
+      toast.info("Please login or signup to enroll in the course.");
+    } else if (user.authorizedCourses?.includes(courseId)) {
+      const slug = createSlug(courseTitle);
+      toast.success("Accessing your course...");
+      navigate(`/course/${slug}`);
+    } else {
+      window.open("https://wa.me/9226221871", "_blank");
     }
   };
 
@@ -254,19 +261,20 @@ export default function Home() {
                   </div>
 
                   {/* Enroll Button */}
-                  <Link
-                    to={`/courses/${course._id}`}
-                    className="mt-auto inline-block w-full text-center bg-purple-600 hover:bg-purple-700 text-white font-medium py-2 rounded-lg transition"
+                  <Button
+                    onClick={() => handleEnrollClick(course._id, course.title)}
+                    className="mt-auto w-full text-lg font-medium py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition"
                   >
-                    Enroll Now
-                  </Link>
+                    {user && user.authorizedCourses?.includes(course._id)
+                      ? "Access Course"
+                      : "Enroll Now"}
+                  </Button>
                 </CardContent>
               </Card>
             ))}
           </div>
         </div>
       </section>
-
 
       {/* ---------------- Gallery Section ---------------- */}
       <section id="gallery" className="py-16 bg-white px-4">
@@ -329,6 +337,7 @@ export default function Home() {
         </div>
       </section>
 
+      {/* ---------------- Why Artistic Vicky Section ---------------- */}
       <section className="py-16 bg-gray-50">
         <div className="max-w-7xl mx-auto px-6 text-center">
           <h2 className="text-4xl font-bold mb-6 text-gray-800">
@@ -355,7 +364,6 @@ export default function Home() {
           </div>
         </div>
       </section>
-
 
       {/* ---------------- Contact Section ---------------- */}
       <section id="contact" className="py-16 px-4 bg-purple-50">
@@ -386,28 +394,18 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ---------------- Product Section ---------------- */}
-      {/* <section id="links" className="py-16 px-4 bg-white">
-        <div className="max-w-6xl mx-auto">
-          <h2 className="text-3xl font-semibold mb-6 text-center">
-            Recommended Art Materials
-          </h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-            {productLinks.map(({ label, url }) => (
-              <a
-                key={label}
-                href={url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="block p-4 bg-white rounded-lg shadow-md border border-purple-200 text-purple-700
-                  hover:bg-purple-600 hover:text-white transition text-center font-medium"
-              >
-                {label}
-              </a>
-            ))}
-          </div>
-        </div>
-      </section> */}
+      {/* ---------------- Auth Modal ---------------- */}
+      {isAuthModalOpen && (
+        <AuthModal
+          mode={authMode}
+          onClose={() => setIsAuthModalOpen(false)}
+          onSwitchMode={setAuthMode}
+          onLoginSuccess={() => {
+            toast.success("Login successful! Please select a course to access.");
+            setIsAuthModalOpen(false);
+          }}
+        />
+      )}
     </div>
   );
 }
