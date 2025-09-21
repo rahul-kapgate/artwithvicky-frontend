@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { useNavigate } from "react-router-dom";
+import { ArrowLeft } from "lucide-react";
 
 interface Question {
   _id: string;
@@ -12,6 +14,7 @@ interface Question {
 }
 
 const MockTestPage: React.FC = () => {
+    const navigate = useNavigate(); 
   const [questions, setQuestions] = useState<Question[]>([]);
   const [answers, setAnswers] = useState<{ [key: string]: string }>({});
   const [loading, setLoading] = useState(true);
@@ -265,6 +268,14 @@ const MockTestPage: React.FC = () => {
     return (
       <div className="min-h-screen bg-gradient-to-b from-purple-50 via-white to-white text-gray-800 scroll-smooth">
         <section className="py-20 px-4">
+           {/* Back Button */}
+                <button
+                  onClick={() => navigate(-1)}
+                  className="flex items-center gap-2 mb-6 text-purple-600 hover:text-purple-800 font-medium"
+                >
+                  <ArrowLeft className="h-5 w-5" />
+                  Back
+                </button>
           <div className="max-w-4xl mx-auto text-center">
             <Card className="rounded-2xl shadow-md">
               <CardContent className="p-6">
