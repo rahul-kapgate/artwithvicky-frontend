@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
-import { AlertCircle, Download } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { AlertCircle, Download, ArrowLeft } from "lucide-react";
 
 interface Resource {
   _id: string;
@@ -11,6 +12,7 @@ interface Resource {
 }
 
 function ResourcePage() {
+  const navigate = useNavigate(); // <-- hook to navigate
   const [resources, setResources] = useState<Resource[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -22,7 +24,6 @@ function ResourcePage() {
   const fetchResources = async () => {
     try {
       const token = localStorage.getItem("accessToken");
-
       if (!token) {
         setError("No access token found");
         setLoading(false);
@@ -39,60 +40,87 @@ function ResourcePage() {
         }
       );
 
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
+      if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
       const data = await response.json();
-      if (!data?.resources) {
-        throw new Error("Unexpected response format");
-      }
+      if (!data?.resources) throw new Error("Unexpected response format");
       setResources(data.resources);
     } catch (err) {
-      setError(
-        err instanceof Error ? err.message : "Failed to fetch resources"
-      );
+      setError(err instanceof Error ? err.message : "Failed to fetch resources");
     } finally {
       setLoading(false);
     }
   };
 
-  const handleDownload = async (url: string, filename: string) => {
+  const handleDownload = (url: string, filename: string) => {
     try {
-      // Extract file ID from Google Drive view URL
+      let downloadUrl = url;
       const fileIdMatch = url.match(/\/d\/(.+?)\/view/);
-      if (!fileIdMatch) {
-        throw new Error("Invalid Google Drive URL");
-      }
-      const fileId = fileIdMatch[1];
-      const downloadUrl = `https://drive.google.com/uc?id=${fileId}&export=download`;
-
-      const response = await fetch(downloadUrl, { method: "GET" });
-      if (!response.ok) {
-        throw new Error("Failed to fetch file");
+      if (fileIdMatch) {
+        const fileId = fileIdMatch[1];
+        downloadUrl = `https://drive.google.com/uc?export=download&id=${fileId}`;
       }
 
-      const contentType = response.headers.get("Content-Type");
-      if (contentType && contentType.includes("text/html")) {
-        // If HTML (likely virus scan warning), open in new tab
-        window.open(downloadUrl, "_blank");
-        return;
-      }
-
-      const blob = await response.blob();
-      const blobUrl = window.URL.createObjectURL(blob);
       const link = document.createElement("a");
-      link.href = blobUrl;
+      link.href = downloadUrl;
       link.download = filename;
+      link.target = "_blank"; // prevent redirect
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
-      window.URL.revokeObjectURL(blobUrl);
     } catch (err) {
       console.error("Download error:", err);
-      // Fallback to opening the original URL
-      window.open(url, "_blank");
+      alert("Download failed. Please try again.");
     }
+  };
+
+  // Group resources
+  const groupedResources = {
+    notes: resources.filter((r) => r.type.toLowerCase() === "notes"),
+    pyq: resources.filter((r) => r.type.toLowerCase() === "pyq"),
+    ebook: resources.filter((r) => r.type.toLowerCase() === "ebook"),
+    session: resources.filter((r) => r.type.toLowerCase() === "session"),
+    others: resources.filter(
+      (r) => !["notes", "pyq", "ebook", "session"].includes(r.type.toLowerCase())
+    ),
+  };
+
+  const renderResourceSection = (title: string, resources: Resource[]) => {
+    if (resources.length === 0) return null;
+
+    return (
+      <div className="mb-8">
+        <h2 className="text-xl font-semibold mb-4 capitalize">{title}</h2>
+        <ul className="space-y-4">
+          {resources.map((resource) => (
+            <li
+              key={resource._id}
+              className="border border-gray-200 rounded-lg p-4 hover:bg-gray-50 flex justify-between items-center"
+            >
+              <div>
+                <button
+                  onClick={() => handleDownload(resource.link, `${resource.title}.pdf`)}
+                  className="text-blue-600 hover:underline font-medium"
+                >
+                  {resource.title}
+                </button>
+                <p className="text-sm text-gray-600">{resource.description}</p>
+                <p className="text-sm text-gray-600">
+                  Type: {resource.type} | Uploaded:{" "}
+                  {new Date(resource.createdAt).toLocaleDateString()}
+                </p>
+              </div>
+              <button
+                onClick={() => handleDownload(resource.link, `${resource.title}.pdf`)}
+                className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+              >
+                <Download className="h-5 w-5" />
+                Download
+              </button>
+            </li>
+          ))}
+        </ul>
+      </div>
+    );
   };
 
   if (loading) {
@@ -114,79 +142,23 @@ function ResourcePage() {
     );
   }
 
-  // Group resources by type
-  const groupedResources = {
-    notes: resources.filter((r) => r.type.toLowerCase() === "notes"),
-    pyq: resources.filter((r) => r.type.toLowerCase() === "pyq"),
-    ebook: resources.filter((r) => r.type.toLowerCase() === "ebook"),
-    session: resources.filter((r) => r.type.toLowerCase() === "session"),
-    others: resources.filter(
-      (r) =>
-        !["notes", "pyq", "ebook", "session"].includes(r.type.toLowerCase())
-    ),
-  };
-
-  const renderResourceSection = (title: string, resources: Resource[]) => {
-    if (resources.length === 0) return null;
-
-    return (
-      <div className="mb-8">
-        <h2 className="text-xl font-semibold mb-4 capitalize">{title}</h2>
-        <ul className="space-y-4">
-          {resources.map((resource) => (
-            <li
-              key={resource._id}
-              className="border border-gray-200 rounded-lg p-4 hover:bg-gray-50 flex justify-between items-center"
-            >
-              <div>
-                <button
-                  onClick={() =>
-                    handleDownload(
-                      resource.link,
-                      `${resource.title}.pdf`
-                    )
-                  }
-                  className="text-blue-600 hover:underline font-medium"
-                >
-                  {resource.title}
-                </button>
-                <p className="text-sm text-gray-600">
-                  {resource.description}
-                </p>
-                <p className="text-sm text-gray-600">
-                  Type: {resource.type} | Uploaded:{" "}
-                  {new Date(resource.createdAt).toLocaleDateString()}
-                </p>
-              </div>
-              <button
-                onClick={() =>
-                  handleDownload(
-                    resource.link,
-                    `${resource.title}.pdf`
-                  )
-                }
-                className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-              >
-                <Download className="h-5 w-5" />
-                Download
-              </button>
-            </li>
-          ))}
-        </ul>
-      </div>
-    );
-  };
-
   return (
     <div className="container mx-auto py-8 p-10">
+      {/* Back Button */}
+      <button
+        onClick={() => navigate(-1)}
+        className="flex items-center gap-2 mb-6 text-purple-600 hover:text-purple-800 font-medium"
+      >
+        <ArrowLeft className="h-5 w-5" />
+        Back
+      </button>
+
       <h1 className="text-2xl font-bold mb-6">Course Resources</h1>
+
       {resources.length > 0 ? (
         <>
           {renderResourceSection("Notes", groupedResources.notes)}
-          {renderResourceSection(
-            "Previous Year Questions",
-            groupedResources.pyq
-          )}
+          {renderResourceSection("Previous Year Questions", groupedResources.pyq)}
           {renderResourceSection("E-Books", groupedResources.ebook)}
           {renderResourceSection("Sessions", groupedResources.session)}
           {renderResourceSection("Other Resources", groupedResources.others)}

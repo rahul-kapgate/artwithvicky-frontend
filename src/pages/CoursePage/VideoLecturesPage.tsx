@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { useNavigate } from "react-router-dom";
 
 interface Video {
   _id: string;
@@ -22,6 +23,7 @@ interface Video {
 }
 
 const VideoLecturesPage: React.FC = () => {
+  const navigate = useNavigate();
   const [videos, setVideos] = useState<Video[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -291,7 +293,16 @@ const VideoLecturesPage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-purple-50 via-white to-white text-gray-800">
+      
       <section className="py-12 px-4">
+        {/* Back Button */}
+        <button
+          onClick={() => navigate(-1)}
+          className="flex items-center gap-2 mb-6 text-purple-600 hover:text-purple-800 font-medium"
+        >
+          <ArrowLeft className="h-5 w-5" />
+          Back
+        </button>
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-12">
             <h1 className="text-4xl font-bold mb-4 text-gray-800">
