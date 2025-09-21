@@ -67,24 +67,16 @@ export default function Header() {
 
           {/* Desktop Nav */}
           <nav className="hidden md:flex space-x-6 text-sm font-medium text-gray-700 items-center">
-            <Link to="/" className={linkClass("/")}>
-              Home
-            </Link>
-            <Link to="/#gallery" className={linkClass("/#gallery")}>
-              Gallery
-            </Link>
+            <Link to="/courses" className={linkClass("/courses")}>
+              Courses
+            </Link>          
             <Link to="/#about" className={linkClass("/#about")}>
               About Us
             </Link>
             <Link to="/#contact" className={linkClass("/#contact")}>
               Contact Us
             </Link>
-            <Link to="/courses" className={linkClass("/courses")}>
-              Courses
-            </Link>
-            <Link to="/#links" className={linkClass("/#links")}>
-              Links
-            </Link>
+            
             {user ? (
               <>
                 <div
