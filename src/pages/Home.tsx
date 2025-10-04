@@ -65,8 +65,8 @@ const courses = [
     title: "MAH AAC CET Full Preparation Course",
     type: "Full Course",
     description:
-      "Complete 6-week program covering Object Drawing, 2D Design, Memory Drawing, and GK. Includes live classes, notes, and mock tests.",
-    duration: "6 Weeks",
+      "Complete 21-week program covering Object Drawing, 2D Design, Memory Drawing, and GK. Includes live classes, notes, and mock tests.",
+    duration: "21 Weeks",
     level: "Advanced",
     originalPrice: 9999,
     discountedPrice: 6999,
@@ -214,11 +214,12 @@ export default function Home() {
             Unlock your creativity and build your skills with our exclusive art courses.
           </p>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+          {/* Courses List */}
+          <div className="flex gap-6 overflow-x-auto sm:grid sm:grid-cols-2 lg:grid-cols-3 scrollbar-hide">
             {courses.map((course) => (
               <Card
                 key={course._id}
-                className="rounded-2xl shadow-md hover:shadow-xl transition duration-300 flex flex-col"
+                className="min-w-[280px] sm:min-w-0 rounded-2xl shadow-md hover:shadow-xl transition duration-300 flex flex-col"
               >
                 <CardContent className="p-6 flex flex-col flex-grow">
                   {/* Title & Type */}
@@ -245,7 +246,7 @@ export default function Home() {
                     <p className="text-gray-500 text-sm line-through">
                       ₹{course.originalPrice}
                     </p>
-                    <p className="text-2xl font-bold text-purple-700">
+                    <p className="text-2xl font-bold text-green-600">
                       ₹{course.discountedPrice}
                     </p>
                   </div>
@@ -273,6 +274,7 @@ export default function Home() {
               </Card>
             ))}
           </div>
+
         </div>
       </section>
 
