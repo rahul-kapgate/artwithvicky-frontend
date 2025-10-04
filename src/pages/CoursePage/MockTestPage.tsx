@@ -51,12 +51,13 @@ const MockTestPage: React.FC = () => {
   }, []);
 
   let userId = "";
+  let role = "";
   const userString = localStorage.getItem("user");
 
   if (userString) {
     const user = JSON.parse(userString);
     userId = user.userId;
-    console.log("User ID:", userId);
+    role = user.role;
   } else {
     console.log("No user found in localStorage");
   }
@@ -67,6 +68,13 @@ const MockTestPage: React.FC = () => {
         setCanTakeTest(false);
         return;
       }
+  
+      // ✅ If admin, allow test without restriction
+      if (role === "admin") {
+        setCanTakeTest(true);
+        return;
+      }
+  
       try {
         const response = await fetch(
           `https://artwithvicky-backend.onrender.com/api/users/profile/${userId}`
@@ -80,39 +88,28 @@ const MockTestPage: React.FC = () => {
           setCanTakeTest(true);
           return;
         }
-        // Sort mockTests by dateOfTest in descending order to ensure latest test
+  
+        // Sort mockTests by latest date
         const sortedTests = mockTests.sort(
           (a: { dateOfTest: string }, b: { dateOfTest: string }) =>
             new Date(b.dateOfTest).getTime() - new Date(a.dateOfTest).getTime()
         );
         const lastTest = sortedTests[0];
         const lastDate = new Date(lastTest.dateOfTest);
-        const nextDate = new Date(lastDate.getTime() + 7 * 24 * 60 * 60 * 1000);
+  
+        // ✅ Changed from 7 days → 1 day
+        const nextDate = new Date(lastDate.getTime() + 1 * 24 * 60 * 60 * 1000);
         setNextAvailableDate(nextDate);
+  
         const today = new Date();
-        // Normalize to UTC date-only for comparison
         const todayUTC = new Date(
-          Date.UTC(
-            today.getUTCFullYear(),
-            today.getUTCMonth(),
-            today.getUTCDate()
-          )
+          Date.UTC(today.getUTCFullYear(), today.getUTCMonth(), today.getUTCDate())
         );
-        // const lastDateUTC = new Date(
-        //   Date.UTC(
-        //     lastDate.getUTCFullYear(),
-        //     lastDate.getUTCMonth(),
-        //     lastDate.getUTCDate()
-        //   )
-        // );
         const nextDateUTC = new Date(
-          Date.UTC(
-            nextDate.getUTCFullYear(),
-            nextDate.getUTCMonth(),
-            nextDate.getUTCDate()
-          )
+          Date.UTC(nextDate.getUTCFullYear(), nextDate.getUTCMonth(), nextDate.getUTCDate())
         );
-        // Allow test only if today is at least 7 days after last test and not on the same day
+  
+        // Only non-admins restricted
         setCanTakeTest(todayUTC >= nextDateUTC);
       } catch (err) {
         console.error(err);
@@ -120,7 +117,7 @@ const MockTestPage: React.FC = () => {
       }
     };
     fetchProfileForTest();
-  }, []);
+  }, [userId, role]);  
 
   useEffect(() => {
     let timer: NodeJS.Timeout;
