@@ -14,7 +14,7 @@ interface Question {
 }
 
 const MockTestPage: React.FC = () => {
-    const navigate = useNavigate(); 
+  const navigate = useNavigate();
   const [questions, setQuestions] = useState<Question[]>([]);
   const [answers, setAnswers] = useState<{ [key: string]: string }>({});
   const [loading, setLoading] = useState(true);
@@ -26,9 +26,10 @@ const MockTestPage: React.FC = () => {
   const [showConfirm, setShowConfirm] = useState(false);
   const [showLeaveConfirm, setShowLeaveConfirm] = useState(false);
   const [showTabSwitchWarning, setShowTabSwitchWarning] = useState(false);
-  // 🚀 Added for 7-day rule
   const [canTakeTest, setCanTakeTest] = useState(false);
   const [nextAvailableDate, setNextAvailableDate] = useState<Date | null>(null);
+  const [testsRemaining, setTestsRemaining] = useState<number>(2);
+
 
   useEffect(() => {
     const fetchQuestions = async () => {
@@ -61,20 +62,22 @@ const MockTestPage: React.FC = () => {
   } else {
     console.log("No user found in localStorage");
   }
-  // 🚀 Updated for strict 7-day rule with UTC sorting
+
+  // 🚀 Updated: 2 tests per day + show remaining tests
   useEffect(() => {
     const fetchProfileForTest = async () => {
       if (!userId) {
         setCanTakeTest(false);
         return;
       }
-  
-      // ✅ If admin, allow test without restriction
+
+      // ✅ Admins can always take the test
       if (role === "admin") {
         setCanTakeTest(true);
+        setTestsRemaining(999); // No limit for admin
         return;
       }
-  
+
       try {
         const response = await fetch(
           `https://artwithvicky-backend.onrender.com/api/users/profile/${userId}`
@@ -82,42 +85,43 @@ const MockTestPage: React.FC = () => {
         if (!response.ok) {
           throw new Error("Failed to fetch profile");
         }
+
         const data = await response.json();
         const mockTests = data.mockTests || [];
-        if (mockTests.length === 0) {
-          setCanTakeTest(true);
-          return;
-        }
-  
-        // Sort mockTests by latest date
-        const sortedTests = mockTests.sort(
-          (a: { dateOfTest: string }, b: { dateOfTest: string }) =>
-            new Date(b.dateOfTest).getTime() - new Date(a.dateOfTest).getTime()
-        );
-        const lastTest = sortedTests[0];
-        const lastDate = new Date(lastTest.dateOfTest);
-  
-        // ✅ Changed from 7 days → 1 day
-        const nextDate = new Date(lastDate.getTime() + 1 * 24 * 60 * 60 * 1000);
-        setNextAvailableDate(nextDate);
-  
+
+        // Get today's date in local time (no time part)
         const today = new Date();
-        const todayUTC = new Date(
-          Date.UTC(today.getUTCFullYear(), today.getUTCMonth(), today.getUTCDate())
-        );
-        const nextDateUTC = new Date(
-          Date.UTC(nextDate.getUTCFullYear(), nextDate.getUTCMonth(), nextDate.getUTCDate())
-        );
-  
-        // Only non-admins restricted
-        setCanTakeTest(todayUTC >= nextDateUTC);
+        const todayStr = today.toLocaleDateString("en-CA"); // e.g. 2025-10-20
+
+        // Filter only today's mock tests
+        const todaysTests = mockTests.filter((test: { dateOfTest: string }) => {
+          const testDate = new Date(test.dateOfTest).toLocaleDateString("en-CA");
+          return testDate === todayStr;
+        });
+
+        const takenToday = todaysTests.length;
+        const remaining = Math.max(2 - takenToday, 0);
+        setTestsRemaining(remaining);
+
+        if (takenToday < 2) {
+          setCanTakeTest(true);
+        } else {
+          setCanTakeTest(false);
+
+          // Calculate next reset (midnight)
+          const midnight = new Date();
+          midnight.setHours(24, 0, 0, 0);
+          setNextAvailableDate(midnight);
+        }
       } catch (err) {
         console.error(err);
         setCanTakeTest(false);
+        setTestsRemaining(0);
       }
     };
+
     fetchProfileForTest();
-  }, [userId, role]);  
+  }, [userId, role]);
 
   useEffect(() => {
     let timer: NodeJS.Timeout;
@@ -265,14 +269,14 @@ const MockTestPage: React.FC = () => {
     return (
       <div className="min-h-screen bg-gradient-to-b from-purple-50 via-white to-white text-gray-800 scroll-smooth">
         <section className="py-20 px-4">
-           {/* Back Button */}
-                <button
-                  onClick={() => navigate(-1)}
-                  className="flex items-center gap-2 mb-6 text-purple-600 hover:text-purple-800 font-medium"
-                >
-                  <ArrowLeft className="h-5 w-5" />
-                  Back
-                </button>
+          {/* Back Button */}
+          <button
+            onClick={() => navigate(-1)}
+            className="flex items-center gap-2 mb-6 text-purple-600 hover:text-purple-800 font-medium"
+          >
+            <ArrowLeft className="h-5 w-5" />
+            Back
+          </button>
           <div className="max-w-4xl mx-auto text-center">
             <Card className="rounded-2xl shadow-md">
               <CardContent className="p-6">
@@ -281,22 +285,32 @@ const MockTestPage: React.FC = () => {
                   Welcome to the Mock Test! You will have 1 hour to complete the
                   test. Click the button below to start.
                 </p>
-                {/* // 🚀 Added for 7-day rule */}
-                {!canTakeTest && nextAvailableDate && (
-                  <p className="text-lg text-red-600 mb-6">
-                    ❌ You can only take one mock test per week. Next available
-                    on{" "}
-                    {nextAvailableDate
-                      ? new Date(nextAvailableDate)
-                          .toLocaleDateString("en-GB", {
-                            day: "2-digit",
-                            month: "2-digit",
-                            year: "numeric",
-                          })
-                          .replace(/\//g, "-")
-                      : ""}
-                  </p>
+
+                {/* 🚀 Show daily test status */}
+                {role !== "admin" && (
+                  <div className="text-lg mb-6">
+                    {canTakeTest ? (
+                      <p className="text-green-600">
+                        ✅ You have <span className="font-semibold">{testsRemaining}</span> mock
+                        test{testsRemaining !== 1 ? "s" : ""} remaining for today.
+                      </p>
+                    ) : (
+                      nextAvailableDate && (
+                        <p className="text-red-600">
+                          ❌ You’ve reached your daily limit of 2 mock tests.
+                          Next available after{" "}
+                          {nextAvailableDate.toLocaleTimeString("en-IN", {
+                            hour: "2-digit",
+                            minute: "2-digit",
+                            hour12: true,
+                          })}{" "}
+                        </p>
+                      )
+                    )}
+                  </div>
                 )}
+
+
                 {canTakeTest ? (
                   <Button
                     className="bg-purple-600 hover:bg-purple-700 text-white px-6 py-2"
