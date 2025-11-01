@@ -69,7 +69,7 @@ const courses = [
     duration: "21 Weeks",
     level: "Advanced",
     originalPrice: 9999,
-    discountedPrice: 6999,
+    discountedPrice:7999,
     modules: [
       "Object Drawing",
       "2D Design",
